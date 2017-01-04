@@ -1,0 +1,285 @@
+// import modules
+require('prototype.spawn')();
+var roleHarvester = require('role.harvester');
+var roleUpgrader = require('role.upgrader');
+var roleBuilder = require('role.builder');
+var roleRepairer = require('role.repairer');
+var roleWallRepairer = require('role.wallRepairer');
+var roleLongDistanceMiner = require('role.longDistanceMiner');
+var roleLongDistanceTransporter = require('role.longDistanceTransporter');
+var roleLongDistanceBuilder = require('role.longDistanceBuilder');
+var roleClaimer = require('role.claimer');
+
+// refactored modules
+var roleMiner = require('role.miner');
+var roleTransporter = require('role.transporter');
+var roleAttacker = require('role.attacker');
+var roleMaintenanceGuy = require('role.maintenanceGuy');
+var roleHealer = require('role.healer');
+
+var homeRoom = 'E78N18';
+var targetRoom = 'E78N17';
+
+// Game.spawns['TX-HQ'].room.storage.id
+// var source = Game.getObjectById(creep.memory.targetSourceId);
+//creep.moveTo(source);
+
+// Game.spawns['TX-HQ'].room.find(FIND_SOURCES) -- Game.rooms.E78N18.find(FIND_SOURCES)
+// Game.spawns['TX-HQ'].room.controller
+
+module.exports.loop = function () {
+    //for (let game_room in Game.rooms) {
+        var minimumNumberOfMiners = 2;
+        var minimumNumberOfHarvesters = 0;
+        var minimumNumberOfUpgraders = 2;
+        var minimumNumberOfBuilders = 1;
+        var minimumNumberOfRepairers = 2;
+        var minimumNumberOfWallRepairers = 1;
+        var minimumNumberOfLongDistanceMiners = 1;
+        var minimumNumberOfTransporters = 2;
+        var minimumNumberOfClaimers = 1;
+        var minimumNumberOfLongDistanceBuilders = 1;
+        var minimumNumberOfLongDistanceTransporters = 2;
+        var minimumNumberOfAttackers = 4;
+        var minimumNumberOfMaintenanceGuys = 1;
+        var minimumNumberOfHealers = 0;
+
+        // sum all Miner creeps
+        var numberOfMiners = _.sum(Game.creeps, (c) => c.memory.role == 'miner');
+
+        // sum all Miner creeps
+        var numberOfTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'transporter');
+
+        // filter out harvesters
+        var numberOfHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'homeHarvester');
+
+        // filter out upgraders
+        var numberOfUpgraders = _.sum(Game.creeps, (c) => c.memory.role == 'upgrader');
+
+        // filter out builders
+        var numberOfBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'builder');
+
+        // filter out repairers
+        var numberOfRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'repairer');
+
+        // filter out claimers
+        var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer');
+
+        // filter out long distance builders
+        var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder');
+
+        // filter out long distance builders
+        var numberOfLongDistanceAttackers = _.sum(Game.creeps, (c) => c.memory.role == 'attacker');
+
+        // filter out maintenance guys
+        var numberOfMaintenanceGuys = _.sum(Game.creeps, (c) => c.memory.role == 'maintenanceGuy');
+
+        // filter out Wall Repairers
+        var numberOfWallRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'wallRepairer');
+
+        // filter out Long Distance Harvesters
+        var numberOfLongDistanceMiners = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceMiner');
+
+        // filter out Long Distance Transporters
+        var numberOfLongDistanceTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceTransporter');
+
+        // filter out Long Distance Transporters
+        var numberOfHealers = _.sum(Game.creeps, (c) => c.memory.role == 'healer');
+
+
+        // run roles
+        runRoles();
+
+        /*if (room_name.name == homeRoom) {
+            if (room_name.controller.level < 2) {
+                // starting a new room
+                //var roles = runRoles(numberOfMiners);
+            }
+            else {
+
+            }
+        }*/
+
+        // find all towers in specific room
+        var towers = Game.rooms.E78N18.find(FIND_STRUCTURES, {
+            filter: (s) => s.structureType == STRUCTURE_TOWER
+        });
+
+        // loop through all towers and find closest enemy creep
+        for (let tower of towers) {
+            var target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            if (target != undefined) {
+                // attack enemy creep
+                tower.attack(target);
+            }
+            else {
+                var structure = tower.pos.findClosestByPath(FIND_STRUCTURES, {
+                    // filter for checking if hitpoints is MAX
+                    filter: (s) => s.hits < 50000 &&
+                                   s.structureType == STRUCTURE_CONTAINER
+                });
+
+                if (structure != undefined) {
+                    // build
+                    tower.repair(structure);
+                }
+            }
+        };
+
+
+        // Maximum available_energy in room from HQ & extensions
+        var maximum_available_energy = Game.spawns['TX-HQ'].room.energyCapacityAvailable;
+
+        var name = undefined;
+
+        if (numberOfMiners < minimumNumberOfMiners) {
+            if (_.sum(Game.creeps, (c) => c.memory.role == 'miner' && c.memory.flagIndex == 'sourceOne') == 1) {
+                flagIndex = 'sourceTwo'
+            }
+            else {
+               flagIndex = 'sourceOne'
+            }
+
+            name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'miner', flagIndex);
+        }
+        else if (numberOfTransporters < minimumNumberOfTransporters) {
+            if (_.sum(Game.creeps, (c) => c.memory.role == 'transporter' && c.memory.flagIndex == 'sourceOneContainer') == 1) {
+                flagIndex = 'sourceTwoContainer'
+            }
+            else {
+               flagIndex = 'sourceOneContainer'
+            }
+
+            name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'transporter', flagIndex);
+        }
+        else if (numberOfUpgraders < minimumNumberOfUpgraders) {
+            name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'upgrader');
+        }
+        else if (numberOfHarvesters < minimumNumberOfHarvesters) {
+           // name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'homeHarvester');
+           name = Game.spawns['TX-HQ'].createCreep([WORK, CARRY, MOVE, MOVE, MOVE], { role: 'homeHarvester', working: false})
+
+            // if spawning failed and we have no harvesters left
+            if (name == ERR_NOT_ENOUGH_ENERGY && numberOfHarvesters == 0) {
+                // spawn one with what is available
+                //name = Game.spawns['TX-HQ'].createCustomCreep(
+                  //  Game.spawns['TX-HQ'].room.energyAvailable, 'homeHarvester');
+                  name = Game.spawns['TX-HQ'].createCreep([WORK, CARRY, MOVE, MOVE, MOVE], { role: 'homeHarvester', working: false})
+            }
+        }
+
+        else if (numberOfRepairers < minimumNumberOfRepairers) {
+            // spawn a new repairer creeep
+            //name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'repairer');
+            name = Game.spawns['TX-HQ'].createCreep([WORK, WORK, CARRY, MOVE, MOVE, CARRY, CARRY, CARRY, MOVE, MOVE],
+            { role: 'repairer', working: false})
+        }
+        else if (numberOfBuilders < minimumNumberOfBuilders) {
+            // spawn a new builder creeep
+            //name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'builder');
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY, CARRY, WORK, WORK], { role: 'builder', working: false})
+        }
+        else if (numberOfLongDistanceBuilders < minimumNumberOfLongDistanceBuilders) {
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, WORK, WORK],
+                    {role: 'longDistanceBuilder', home_room: homeRoom, working: false});
+        }
+        else if (numberOfMaintenanceGuys < minimumNumberOfMaintenanceGuys) {
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE,
+                                                     CARRY, CARRY, CARRY, CARRY, CARRY, CARRY], {role: 'maintenanceGuy'});
+        }
+        else if (numberOfLongDistanceAttackers < minimumNumberOfAttackers) {
+            name = Game.spawns['TX-HQ'].createCreep([TOUGH,
+                                                     MOVE, MOVE,
+                                                     ATTACK],
+                {role: 'attacker',
+                 home_room: homeRoom});
+            /*name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
+                                                     MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                     ATTACK, ATTACK],
+                {role: 'attacker',
+                 home_room: homeRoom});*/
+        }
+        else if (numberOfHealers < minimumNumberOfHealers) {
+            name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH,
+                                                     MOVE, MOVE, MOVE, MOVE,
+                                                     HEAL, HEAL],
+                {role: 'healer',
+                 home_room: homeRoom});
+        }
+        else if (numberOfWallRepairers < minimumNumberOfWallRepairers) {
+            // good body part RATIO!
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], {role: 'wallRepairer',  working: false});
+        }
+        else if (numberOfLongDistanceMiners < minimumNumberOfLongDistanceMiners) {
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, WORK, WORK, WORK, WORK],
+                {role: 'longDistanceMiner', home_room: homeRoom, working: false});
+        }
+        else if (numberOfLongDistanceTransporters < minimumNumberOfLongDistanceTransporters) {
+            name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+                {role: 'longDistanceTransporter', home_room: homeRoom, working: false});
+        }
+        else if (numberOfClaimers < minimumNumberOfClaimers) {
+            if (Game.flags['Controller:Claim:E78N18'].room.controller.reservation == undefined) {
+                name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                    {role: 'claimer',
+                     home_room: homeRoom});
+            }
+            else if (Game.flags['Controller:Claim:E78N18'].room.controller.reservation.ticksToEnd < 200) {
+                name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                    {role: 'claimer',
+                     home_room: homeRoom});
+            }
+        }
+    //};
+
+    function runRoles() {
+        for (let name in Game.creeps) {
+            // access all creep properties in loop
+            var creep = Game.creeps[name];
+
+            if (creep.memory.role == 'miner') {
+                roleMiner.run(creep);
+            }
+            else if (creep.memory.role == 'transporter') {
+                roleTransporter.run(creep);
+            }
+            else if (creep.memory.role == 'upgrader') {
+                roleUpgrader.run(creep);
+            }
+            //else if (creep.memory.role == 'homeHarvester') {
+              //  roleHarvester.run(creep);
+            //}
+            else if (creep.memory.role == 'builder') {
+                roleBuilder.run(creep);
+            }
+            else if (creep.memory.role == 'repairer') {
+                roleRepairer.run(creep);
+            }
+            else if (creep.memory.role == 'longDistanceBuilder') {
+                roleLongDistanceBuilder.run(creep);
+            }
+            else if (creep.memory.role == 'claimer') {
+                roleClaimer.run(creep);
+            }
+            else if (creep.memory.role == 'attacker') {
+                roleAttacker.run(creep);
+            }
+            else if (creep.memory.role == 'healer') {
+                roleHealer.run(creep);
+            }
+            else if (creep.memory.role == 'maintenanceGuy') {
+                roleMaintenanceGuy.run(creep);
+            }
+            else if (creep.memory.role == 'wallRepairer') {
+                roleWallRepairer.run(creep);
+            }
+            else if (creep.memory.role == 'longDistanceMiner') {
+                roleLongDistanceMiner.run(creep);
+            }
+            else if (creep.memory.role == 'longDistanceTransporter') {
+                roleLongDistanceTransporter.run(creep);
+            }
+        }
+    };
+};
+
