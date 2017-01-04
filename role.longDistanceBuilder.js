@@ -5,41 +5,44 @@ module.exports = {
 
         if(harvestFlag){
             if(creep.room == harvestFlag.room) {
-                if (creep.carry.energy == creep.carryCapacity) {
-                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                if (creep.carry.energy > 0) {
 
-                    if (constructionSite != undefined) {
+                    var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (s) => s.structureType != STRUCTURE_WALL &&
+                                       s.structureType != STRUCTURE_RAMPART &&
+                                       s.hits < (s.hitsMax / 2)
+                    });
+
+                    if (structure == undefined) {
+                        var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                    }
+
+
+                    if (structure != undefined) {
+                        if (structure.hits < (structure.hitsMax / 2)) {
+                            creep.say('repair');
+                            if (creep.repair(structure) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(structure);
+                            }
+                        }
+                    }
+                    else if (constructionSite != undefined) {
                         creep.say('build');
                         if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(constructionSite);
                         }
                     }
                     else {
-                        /*var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                            filter: (s) => s.structureType != STRUCTURE_WALL &&
-                                           s.structureType != STRUCTURE_RAMPART
+                        let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_CONTAINER
                         });
 
-                        if (structure != undefined) {
-                            if (structure.hits < (structure.hitsMax / 2)) {
-                                creep.say('repair');
-                                if (creep.repair(structure) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(structure);
-                                }
+                        if (container != undefined) {
+                            creep.say('transfer');
+                            if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(container);
                             }
-                        }*/
-                        //else {
-                            let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                filter: s => s.structureType == STRUCTURE_CONTAINER
-                            });
-
-                            if (container != undefined) {
-                                creep.say('transfer');
-                                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(container);
-                                }
-                            }
-                        //}
+                        }
                     }
                 }
                 else {

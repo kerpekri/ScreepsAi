@@ -1,13 +1,12 @@
 module.exports = {
     run: function(creep) {
         if (creep.memory.closeToSource == false) {
-            var destination_flag = creep.memory.flagIndex;
+            var flag = Game.flags[creep.memory.flagIndex];
+            var flagCheck = creep.moveTo(Game.flags[creep.memory.flagIndex]);
 
-            // somehow we need to specify flags dynamic
-            var path = creep.pos.findPathTo(Game.flags[destination_flag]);
-
-            if (path.length > 1) {
-                creep.move(path[0].direction);
+            if (flagCheck != 0 && flagCheck != -4) {
+                creep.say('go flag');
+                creep.moveTo(flag);
             }
             else {
                 creep.memory.closeToSource = true;
@@ -15,10 +14,12 @@ module.exports = {
         }
         else if (creep.memory.closeToSource == true && creep.carry.energy < creep.carryCapacity) {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);
-            creep.harvest(source);
+
+            if (creep.harvest(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(source);
+            }
         }
         else if (creep.memory.closeToSource == true && creep.carry.energy == creep.carryCapacity) {
-            // find closest container
             let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_CONTAINER
             });

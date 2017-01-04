@@ -45,3 +45,24 @@ else if (roleName == 'miner') {
     var allowedCarryParts = [BODYPARTS_ALL[2]];
     var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', 3).slice(0,-1);
 }
+//
+//
+// how to access memory role in screeps
+Game.creeps.Chase.memory.role = 'upgrader'
+
+// spawn new creep
+Game.spawns['TX-HQ'].createCreep([CARRY, CARRY, MOVE, MOVE], { role: 'transporter', GetEnergyFromContainer: true,
+                                            MoveEnergyToContainer: false, flagIndex: 'sourceOneContainer'})
+
+// https://www.youtube.com/watch?v=1UB0h468A8M&index=8&list=PL0EZQ169YGlor5rzeJEYYPE3tGYT2zGT2
+
+longDistanceBuilder
+
+Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY, CARRY], { role: 'transporter', flagIndex: 'sourceOneContainer'})
+
+name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'transporter', flagIndex: 'sourceOneContainer');
+//
+//
+https://github.com/Garethp/Screeps/blob/master/roles_healer.js
+https://github.com/Garethp/Screeps/blob/master/roles_guard.js
+https://github.com/Garethp/Screeps/blob/master/roles_archer.js

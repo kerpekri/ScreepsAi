@@ -6,10 +6,10 @@ module.exports = {
         if(attackFlag){
                 var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
                 var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
-                var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
-            //console.log(hostileCreeps);
-            //console.log((attackFlag.room && (hostileCreeps != null) && (hostileSpawns != null) && (hostileStructures =! null)));
-            if(attackFlag.room) {
+                var hostileStructures = creep.pos.findClosestByRange(FIND_STRUCTURES,
+                { filter: (i) => i.structureType == STRUCTURE_WALL });
+
+            if(creep.room == attackFlag.room) {
                 if(hostileCreeps) {
                     if(creep.attack(hostileCreeps) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(hostileCreeps);
