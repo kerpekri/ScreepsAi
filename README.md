@@ -1,0 +1,3 @@
+# ScreepsAi
+
+Screeps AI script :)
