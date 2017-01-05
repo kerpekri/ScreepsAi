@@ -1,6 +1,72 @@
 module.exports = {
     run: function(creep) {
-        if (creep.memory.GetEnergyFromContainer == true && creep.memory.MoveEnergyToContainer == false) {
+        var controllerFlag = Game.flags['controllerContainer'];
+
+        /*if (creep.carry.energy == 0) {
+            var storage = creep.room.storage;
+
+            if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.moveTo(storage);
+            }
+
+
+
+        }
+        else if (creep.carry.energy > 0) {
+
+            var structure = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_SPAWN     ||
+                                s.structureType == STRUCTURE_EXTENSION ||
+                                s.structureType == STRUCTURE_TOWER)  &&
+                                s.energy < s.energyCapacity
+            });
+
+            if (structure != undefined) {
+                if (creep.transfer(structure, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(structure);
+                }
+            }
+        }*/
+        if (creep.carry.energy != creep.carryCapacity) {
+            var pos = Game.flags[creep.memory.flagIndex].pos;
+            //console.log(creep.name + ' ' + pos);
+
+            var container = pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_CONTAINER
+            });
+
+            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.say('take energy');
+                creep.moveTo(Game.flags[creep.memory.flagIndex]);
+            }
+        }
+        else if (creep.carryCapacity == creep.carryCapacity) {
+            var pos = Game.rooms.E78N18.controller.pos;
+            //console.log(creep.name + ' ' + pos);
+
+            var container = pos.findClosestByPath(FIND_STRUCTURES, {
+                filter: s => s.structureType == STRUCTURE_CONTAINER
+            });
+
+
+            if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.say('transfer C');
+                creep.moveTo(container);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+        /*if (creep.memory.GetEnergyFromContainer == true && creep.memory.MoveEnergyToContainer == false) {
 
             var dropenergy = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
                 filter: (d) => {return (d.resourceType == RESOURCE_ENERGY)}});
@@ -8,7 +74,7 @@ module.exports = {
             // get the energy
             if (dropenergy) {
                 if (creep.pickup(dropenergy) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(dropenergy)
+                    creep.moveTo(dropenergy)
                 }
             }
 
@@ -85,6 +151,6 @@ module.exports = {
                 }
 
             }
-        }
+        }*/
     }
 };

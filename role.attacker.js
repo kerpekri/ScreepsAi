@@ -28,6 +28,9 @@ module.exports = {
                         creep.moveTo(hostileStructures);
                     }
                 }
+                else {
+                    creep.moveTo(attackFlag);
+                }
             }
             else {
                 creep.moveTo(attackFlag);

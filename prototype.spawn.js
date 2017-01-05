@@ -15,7 +15,7 @@ module.exports = function() {
 
                 if (energy_available > 600) {
                     // 6W 2M 1C - body part count
-                    var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 2).slice(0,-1);
+                    var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 3).slice(0,-1);
                 }
                 else {
                     var allowedMoveParts = BODYPARTS_ALL[0];

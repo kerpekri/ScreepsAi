@@ -82,7 +82,7 @@ module.exports.loop = function () {
 
                 var minimumNumberOfMiners = 2;
                 var minimumNumberOfHarvesters = 0;
-                var minimumNumberOfUpgraders = 2;
+                var minimumNumberOfUpgraders = 3;
                 var minimumNumberOfBuilders = 1;
                 var minimumNumberOfRepairers = 2;
                 var minimumNumberOfWallRepairers = 1;
@@ -92,7 +92,7 @@ module.exports.loop = function () {
                 var minimumNumberOfLongDistanceBuilders = 1;
                 var minimumNumberOfLongDistanceTransporters = 2;
                 var minimumNumberOfAttackers = 4;
-                var minimumNumberOfMaintenanceGuys = 1;
+                var minimumNumberOfMaintenanceGuys = 3;
                 var minimumNumberOfHealers = 0;
 
                 // sum all Miner creeps
