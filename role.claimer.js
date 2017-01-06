@@ -1,7 +1,8 @@
 module.exports = {
     run: function(creep) {
-        var claimFlag = Game.flags['Controller:Claim:' + creep.memory.home_room]
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room]
+        var claimFlag = Game.flags['Controller:Claim:' + creep.memory.home_room];
+        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room];
+        var xxxFlag = Game.flags[':Home:' + creep.memory.home_room];
 
         if(claimFlag){
             if(claimFlag.room && claimFlag.room.controller) {

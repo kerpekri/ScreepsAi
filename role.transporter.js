@@ -48,7 +48,6 @@ module.exports = {
                 filter: s => s.structureType == STRUCTURE_CONTAINER
             });
 
-
             if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.say('transfer C');
                 creep.moveTo(container);

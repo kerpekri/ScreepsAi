@@ -14,7 +14,7 @@ module.exports = function() {
                 var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
                 if (energy_available > 600) {
-                    // 6W 2M 1C - body part count
+                    // 5W 3M 1C - body part count
                     var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 3).slice(0,-1);
                 }
                 else {
@@ -29,7 +29,7 @@ module.exports = function() {
 
                 return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex});
             }
-            else if (roleName == 'transporter') {
+            else if (roleName == 'transporter' || roleName == 'maintenanceGuy') {
                 if (energy_available > 600) {
                     energy_available = 450;
                 }
@@ -38,7 +38,8 @@ module.exports = function() {
                 var movePartCount = Math.floor(energy_available / energyNeededForCarryAndMoveParts);
                 var carryPartCount = movePartCount * 2;
 
-                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', movePartCount).slice(0,-1);;
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 5).slice(0,-1);
+                //var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', movePartCount).slice(0,-1);;
                 var allowedCarryParts = _.repeat(BODYPARTS_ALL[2] + ',', carryPartCount).slice(0,-1);;
 
 
@@ -57,7 +58,7 @@ module.exports = function() {
             }
             else if (roleName == 'upgrader') {
                 if (energy_available > 600) {
-                    energy_available = 600;
+                    energy_available = 1300;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];

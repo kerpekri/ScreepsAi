@@ -8,7 +8,7 @@ module.exports = {
                 var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
                 var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
 
-            if(attackFlag.room && (hostileCreeps != null) && (hostileSpawns != null) && (hostileStructures =! null)) {
+            if(creep.room == attackFlag.room) {
                 if(hostileCreeps) {
                     var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
                         filter: function(object) {

@@ -18,29 +18,12 @@ module.exports = {
 
         // if it is working
         if (creep.memory.working == true) {
-            creep.say('mani mekle');
             var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                 // filter for checking if hitpoints is MAX
                 filter: (s) => s.hits < s.hitsMax &&
                                s.structureType != STRUCTURE_WALL &&
                                s.structureType != STRUCTURE_RAMPART
             });
-
-            /*var criticalRepair = Game.spawns['TX-HQ'].room.find(FIND_STRUCTURES, {
-                filter: (structure) => {
-                    return (structure.hits < (structure.hitsMax / 10) && structure.structureType != STRUCTURE_WALL)
-                }
-            });*/
-
-           // console.log(criticalRepair);
-
-            /*if (criticalRepair != undefined) {
-                var heavyRepair = tower.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return (structure.hits < (structure.hitsMax / 5) && structure.structureType != STRUCTURE_WALL)
-                    }
-                });
-            }*/
 
             if (structure != undefined) {
                 if (creep.repair(structure) == ERR_NOT_IN_RANGE) {
@@ -66,6 +49,13 @@ module.exports = {
                             creep.say('rep wall');
                             if (creep.repair(damagedWall) == ERR_NOT_IN_RANGE) {
                                 creep.moveTo(damagedWall);
+                            }
+                        }
+                        else {
+                            var storage = creep.room.storage;
+
+                            if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.moveTo(storage);
                             }
                         }
                     }

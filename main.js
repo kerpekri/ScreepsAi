@@ -33,6 +33,11 @@ module.exports.loop = function () {
         for (var spawnName in Game.spawns) {
             var spawn = Game.spawns[spawnName];
 
+            // filter out claimers
+            //var xxx = _.sum(Game.creeps, (c) => c.memory.role == 'attacker' && console.log('x: ' + c.room));
+            //console.log(room);
+
+
             if (spawn.room.name ==  roomName) {
                 // run code for BUILDING rooms with a spawn building
                 //console.log(room.controller.level);
@@ -82,7 +87,7 @@ module.exports.loop = function () {
 
                 var minimumNumberOfMiners = 2;
                 var minimumNumberOfHarvesters = 0;
-                var minimumNumberOfUpgraders = 3;
+                var minimumNumberOfUpgraders = 2;
                 var minimumNumberOfBuilders = 1;
                 var minimumNumberOfRepairers = 2;
                 var minimumNumberOfWallRepairers = 1;
@@ -91,7 +96,7 @@ module.exports.loop = function () {
                 var minimumNumberOfClaimers = 1;
                 var minimumNumberOfLongDistanceBuilders = 1;
                 var minimumNumberOfLongDistanceTransporters = 2;
-                var minimumNumberOfAttackers = 4;
+                var minimumNumberOfAttackers = 2;
                 var minimumNumberOfMaintenanceGuys = 3;
                 var minimumNumberOfHealers = 0;
 
@@ -112,10 +117,8 @@ module.exports.loop = function () {
 
                 // filter out repairers
                 var numberOfRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'repairer');
-
-                // filter out claimers
+                // claimers
                 var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer');
-
                 // filter out long distance builders
                 var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder');
 
@@ -155,14 +158,26 @@ module.exports.loop = function () {
                     }
                     else {
                         var structure = tower.pos.findClosestByPath(FIND_STRUCTURES, {
-                            // filter for checking if hitpoints is MAX
-                            filter: (s) => s.hits < 50000 &&
-                                           s.structureType == STRUCTURE_CONTAINER
+                            filter: (s) => (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_CONTAINER) ||
+                                           (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_EXTENSION) ||
+                                           (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_STORAGE) ||
+                                           (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_LINK)
                         });
 
                         if (structure != undefined) {
                             // build
                             tower.repair(structure);
+                        }
+                        else {
+                            var structure = tower.pos.findClosestByPath(FIND_STRUCTURES, {
+                                filter: (s) => (s.hits < (s.hitsMax / 10) && s.structureType == STRUCTURE_ROAD) //||
+                                               //(s.hits < (s.hitsMax / 180) && s.structureType == STRUCTURE_RAMPART)
+                            });
+
+                            if (structure != undefined) {
+                                // build
+                                tower.repair(structure);
+                            }
                         }
                     }
                 };
@@ -225,17 +240,22 @@ module.exports.loop = function () {
                             {role: 'longDistanceBuilder', home_room: homeRoom, working: false});
                 }
                 else if (numberOfMaintenanceGuys < minimumNumberOfMaintenanceGuys) {
-                    name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE,
-                                                             CARRY, CARRY, CARRY, CARRY, CARRY, CARRY], {role: 'maintenanceGuy'});
+                    flagIndex = 'test';
+                    name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'maintenanceGuy', flagIndex);
                 }
                 else if (numberOfLongDistanceAttackers < minimumNumberOfAttackers) {
+                    ///
+
+
+
+                    ///
                     name = Game.spawns['TX-HQ'].createCreep([TOUGH,
                                                              MOVE, MOVE,
                                                              ATTACK],
                         {role: 'attacker',
                          home_room: homeRoom});
                     /*name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
-                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                             MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,MOVE,
                                                              ATTACK, ATTACK],
                         {role: 'attacker',
                          home_room: homeRoom});*/
@@ -260,6 +280,7 @@ module.exports.loop = function () {
                         {role: 'longDistanceTransporter', home_room: homeRoom, working: false});
                 }
                 else if (numberOfClaimers < minimumNumberOfClaimers) {
+
                     if (Game.flags['Controller:Claim:E78N18'].room.controller.reservation == undefined) {
                         name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
                             {role: 'claimer',
@@ -271,9 +292,35 @@ module.exports.loop = function () {
                              home_room: homeRoom});
                     }
                 }
+
+
                 // te
             }
             else {
+                var NeedToReserveRooms = ['E78N17','E79N18'];
+                var pos = new RoomPosition(32, 26, 'E79N18');
+                //console.log(roomName);
+
+                if (NeedToReserveRooms.indexOf(roomName) > -1) {
+                    var minimumNumberOfClaimers = 1;
+                    // filter out claimers
+                    var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer');
+                    //E79N18:ReserveController:E78N18
+                    /*if (numberOfClaimers < minimumNumberOfClaimers) {
+
+                        if (Game.flags['Controller:Claim:E78N18'].room.controller.reservation == undefined) {
+                            name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                                {role: 'claimer',
+                                 home_room: homeRoom});
+                        }
+                        else if (Game.flags['Controller:Claim:E78N18'].room.controller.reservation.ticksToEnd < 200) {
+                            name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                                {role: 'claimer',
+                                 home_room: homeRoom});
+                        }
+                    }*/
+                }
+
                 // run code for CONNECTING rooms without a spawn building
                 // AT THE MOMENT DONT DO ANYTHING FOR ROOMS WITHOUT SPAWN
             }
