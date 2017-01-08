@@ -1,20 +1,15 @@
 module.exports = {
     run: function(creep) {
-        var claimFlag = Game.flags['Controller:Claim:' + creep.memory.home_room];
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room];
-        var xxxFlag = Game.flags[':Home:' + creep.memory.home_room];
+        var claimFlag = Game.flags[creep.memory.targetRoom + ':ReserveController:' + creep.memory.homeRoom];
+        var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
 
         if(claimFlag){
-            if(claimFlag.room && claimFlag.room.controller) {
+            if(creep.room == claimFlag.room) {
                 if (creep.reserveController(claimFlag.room.controller) == ERR_NOT_IN_RANGE){
                     creep.moveTo(claimFlag.room.controller)
-                    creep.say('Claimer: Claim')
-                } else {
-                    creep.say('Claimer: Claiming')
                 }
             } else {
                 creep.moveTo(claimFlag)
-                creep.say('Claimer: Claim')
             }
         } else {
             creep.moveTo(homeFlag);

@@ -38,8 +38,8 @@ module.exports = function() {
                 var movePartCount = Math.floor(energy_available / energyNeededForCarryAndMoveParts);
                 var carryPartCount = movePartCount * 2;
 
-                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 5).slice(0,-1);
-                //var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', movePartCount).slice(0,-1);;
+
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', movePartCount).slice(0,-1);;
                 var allowedCarryParts = _.repeat(BODYPARTS_ALL[2] + ',', carryPartCount).slice(0,-1);;
 
 
@@ -58,13 +58,14 @@ module.exports = function() {
             }
             else if (roleName == 'upgrader') {
                 if (energy_available > 600) {
-                    energy_available = 1300;
+                    energy_available = 1350;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
                 var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
-                var allowedMoveParts = BODYPARTS_ALL[0];
+                //var allowedMoveParts = BODYPARTS_ALL[0];
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 6).slice(0,-1);
                 var allowedCarryParts = BODYPARTS_ALL[2];
                 var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
 
@@ -103,6 +104,31 @@ module.exports = function() {
                 var allowedMoveParts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]; // 6
                 var allowedCarryParts = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]; // 7
                 var allowedWorkParts = [WORK, WORK, WORK, WORK]; // 4
+            }
+            else if (roleName == 'longDistanceMiner') {
+                if (energy_available > 600) {
+                    // 6W 2M 1C - body part count
+                    energy_available = 750;
+                }
+
+                var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
+                var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
+
+                if (energy_available > 600) {
+                    // 5W 3M 1C - body part count
+                    var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 4).slice(0,-1);
+                }
+                else {
+                    var allowedMoveParts = BODYPARTS_ALL[0];
+                }
+                var allowedCarryParts = BODYPARTS_ALL[2];
+                var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
+
+                // only now needed
+                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
+                var body = allPartsTogether.split(",");
+
+                return this.createCreep(body, undefined, { role: roleName, home_room: 'E78N18', working: false});
             }
 
             if (roleName != 'miner' ) {

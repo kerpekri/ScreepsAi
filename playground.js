@@ -58,11 +58,29 @@ Game.spawns['TX-HQ'].createCreep([CARRY, CARRY, MOVE, MOVE], { role: 'transporte
 
 longDistanceBuilder
 
-Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY, CARRY], { role: 'transporter', flagIndex: 'sourceOneContainer'})
-
+Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY], { role: 'maintenanceGuy', flagIndex: 'sourceOneContainer'})
+Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'miner', flagIndex);
+name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'maintenanceGuy', 'test');
 name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'transporter', flagIndex: 'sourceOneContainer');
 //
 //
 https://github.com/Garethp/Screeps/blob/master/roles_healer.js
 https://github.com/Garethp/Screeps/blob/master/roles_guard.js
 https://github.com/Garethp/Screeps/blob/master/roles_archer.js
+
+// FLAGS
+<kur>:ReserveController:<no kurienes> - color light blue
+E77N18:SourceOne:E78N18 - yellow
+E77N18:SourceOneContainer:E78N18 - brown
+E77N18:ExploreRoom:E78N18 - white
+E78N17:ReserveController:E78N18 - green
+
+//
+// check if array object
+if( Object.prototype.toString.call( nextAvailableRooms ) === '[object Array]' ) {
+    console.log('array');
+}
+//
+//
+
+

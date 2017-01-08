@@ -31,7 +31,7 @@ module.exports = {
                 }
                 else {
                     var damagedRampart = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: (i) => i.structureType == STRUCTURE_RAMPART && i.hits < 30001
+                        filter: (i) => i.structureType == STRUCTURE_RAMPART && i.hits < 55000
                     });
 
                     if (damagedRampart != undefined) {
@@ -42,7 +42,7 @@ module.exports = {
                     }
                     else {
                         var damagedWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                            filter: (i) => i.structureType == STRUCTURE_WALL && i.hits < 30001
+                            filter: (i) => i.structureType == STRUCTURE_WALL && i.hits < 55000
                         });
 
                         if (damagedWall != undefined) {

@@ -1,12 +1,11 @@
 module.exports = {
     run: function(creep) {
-        var harvestFlag = Game.flags['Source:Harvest:' + creep.memory.home_room]
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room]
+        var explorerFlag = Game.flags[creep.memory.targetRoom + ':ExploreRoom:' + creep.memory.homeRoom];
+        var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
 
-        if(harvestFlag){
-            if(creep.room == harvestFlag.room) {
+        if(explorerFlag){
+            if(creep.room == explorerFlag.room) {
                 if (creep.carry.energy > 0) {
-
                     var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (s) => s.structureType != STRUCTURE_WALL &&
                                        s.structureType != STRUCTURE_RAMPART &&
@@ -16,7 +15,6 @@ module.exports = {
                     if (structure == undefined) {
                         var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                     }
-
 
                     if (structure != undefined) {
                         if (structure.hits < (structure.hitsMax / 2)) {
@@ -54,7 +52,7 @@ module.exports = {
                     }
                 }
             } else {
-                creep.moveTo(harvestFlag)
+                creep.moveTo(explorerFlag)
             }
         } else {
             creep.moveTo(homeFlag);

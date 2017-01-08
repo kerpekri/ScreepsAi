@@ -4,29 +4,37 @@ module.exports = {
         //var xxxFlag = Game.flags[creep.memory.targetRoom: + ':Attack:' + creep.memory.homeRoom];
         var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room];
 
+        //nextAvailableRooms = _.values(Game.map.describeExits('E78N18'));
+
+
+
         if(attackFlag){
                 var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
                 var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
-                var hostileStructures = creep.pos.findClosestByRange(FIND_STRUCTURES,
-                { filter: (i) => i.structureType == STRUCTURE_WALL });
+                var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES,
+                    { filter: (i) => i.structureType == STRUCTURE_WALL ||
+                                     i.structureType == STRUCTURE_CONTAINER});
 
             if(creep.room == attackFlag.room) {
-                if(hostileSpawns) {
-                    if(creep.attack(hostileSpawns) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(hostileSpawns);
-                        //creep.attack(hostileCreeps);
-                    }
-
+                if (1 == 2) {
+                    creep.moveTo(attackFlag);
                 }
-                else if (hostileCreeps) {
+                else if(hostileCreeps) {
                     if(creep.attack(hostileCreeps) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(hostileCreeps);
+                        //creep.attack(hostileCreeps);
                     }
 
                 }
                 else if (hostileStructures) {
                     if(creep.attack(hostileStructures) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(hostileStructures);
+                    }
+
+                }
+                else if (hostileSpawns) {
+                    if(creep.attack(hostileSpawns) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(hostileSpawns);
                     }
                 }
                 else {
