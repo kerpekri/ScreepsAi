@@ -74,6 +74,7 @@ E77N18:SourceOne:E78N18 - yellow
 E77N18:SourceOneContainer:E78N18 - brown
 E77N18:ExploreRoom:E78N18 - white
 E78N17:ReserveController:E78N18 - green
+E78N18:Container:E78N18 - red
 
 //
 // check if array object

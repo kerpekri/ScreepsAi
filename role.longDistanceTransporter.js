@@ -1,10 +1,11 @@
 module.exports = {
     run: function(creep) {
-        var containerFlag = Game.flags['Container:Withdraw:' + creep.memory.home_room]
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room]
+        var explorerFlag = Game.flags[creep.memory.targetRoom + ':ExploreRoom:' + creep.memory.homeRoom];
+        var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
+        var containerFlag = Game.flags[creep.memory.homeRoom + ':Container:' + creep.memory.targetRoom];
 
-        if(containerFlag){
-            if(creep.room == containerFlag.room) {
+        if(explorerFlag){
+            if(creep.room == explorerFlag.room) {
                 if (creep.carry.energy == creep.carryCapacity) {
                     creep.moveTo(homeFlag);
                 }
@@ -22,9 +23,7 @@ module.exports = {
                 }
             }
             else if (creep.room == homeFlag.room && creep.carry.energy == creep.carryCapacity) {
-                var homeContainerFlag = Game.flags['Home:Container:One'];
-
-                if (creep.moveTo(homeContainerFlag) == 0) {
+                if (creep.moveTo(containerFlag) == 0) {
                     let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: s => s.structureType == STRUCTURE_CONTAINER &&
                                      s.store[RESOURCE_ENERGY] != 2000
@@ -32,7 +31,6 @@ module.exports = {
 
                     if (container != undefined) {
                         creep.say('transfer');
-                        //console.log(container);
                         if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(container);
                         }
@@ -47,11 +45,11 @@ module.exports = {
                     }
                 }
                 else {
-                    creep.moveTo(homeContainerFlag);
+                    creep.moveTo(containerFlag);
                 }
             }
             else {
-                creep.moveTo(containerFlag)
+                creep.moveTo(explorerFlag)
             }
         } else {
             creep.moveTo(homeFlag);

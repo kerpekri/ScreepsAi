@@ -112,11 +112,24 @@ module.exports = {
                 }
             }
             else {
-                creep.say('fillStorage');
-                var storage = creep.room.storage;
+                var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                if (constructionSite != undefined) {
+                    if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
+                        creep.say('build');
+                        creep.moveTo(constructionSite);
+                    }
+                }
+                else {
+                    var damagedWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (i) => i.structureType == STRUCTURE_WALL && i.hits
+                    });
 
-                if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(storage);
+                    if (damagedWall != undefined) {
+                        if (creep.repair(damagedWall) == ERR_NOT_IN_RANGE) {
+                            creep.say('rep wall');
+                            creep.moveTo(damagedWall);
+                        }
+                    }
                 }
             }
         }

@@ -1,13 +1,19 @@
 module.exports = {
     run: function(creep) {
-        var harvestFlag = Game.flags['Source:Harvest:' + creep.memory.home_room]
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room]
+        var explorerFlag = Game.flags[creep.memory.targetRoom + ':ExploreRoom:' + creep.memory.homeRoom];
+        var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
 
-        if(harvestFlag){
-            if(creep.room == harvestFlag.room) {
-                if (creep.carry.energy == creep.carryCapacity) {
-                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,
-                        {filter: (s) => s.structureType == STRUCTURE_CONTAINER});
+        if(explorerFlag){
+            if(creep.room == explorerFlag.room) {
+                if (creep.carry.energy > 0) {
+                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{
+                        filter: (s) => s.structureType == STRUCTURE_CONTAINER
+                    });
+
+                    var damagedContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (s) => s.structureType == STRUCTURE_CONTAINER &&
+                                       s.hits < (s.hitsMax / 2)
+                    });
 
                     if (constructionSite != undefined) {
                         creep.say('build');
@@ -15,34 +21,21 @@ module.exports = {
                             creep.moveTo(constructionSite);
                         }
                     }
+                    else if (damagedContainer != undefined) {
+                        creep.say('repair');
+                        if (creep.repair(damagedContainer) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(damagedContainer);
+                        }
+                    }
                     else {
-                        /*var structure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                            filter: (s) => s.structureType == STRUCTURE_CONTAINER &&
-                                           s.structureType != STRUCTURE_WALL &&
-                                           s.structureType != STRUCTURE_RAMPART
+                        let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                            filter: s => s.structureType == STRUCTURE_CONTAINER
                         });
 
-                        if (structure != undefined) {
-                            if (structure.hits < (structure.hitsMax / 2)) {
-                                creep.say('repair');
-                                if (creep.repair(structure) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(structure);
-                                }
-                            }
-                            console.log('xx');
-                        }*/
-                        //else {
-                            let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                filter: s => s.structureType == STRUCTURE_CONTAINER
-                            });
-
-                            if (container != undefined) {
-                                creep.say('transfer');
-                                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                                    creep.moveTo(container);
-                                }
-                            }
-                        //}
+                        if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.say('transfer');
+                            creep.moveTo(container);
+                        }
                     }
                 }
                 else {
@@ -54,7 +47,7 @@ module.exports = {
                     }
                 }
             } else {
-                creep.moveTo(harvestFlag)
+                creep.moveTo(explorerFlag)
             }
         } else {
             creep.moveTo(homeFlag);
