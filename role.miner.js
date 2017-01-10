@@ -1,5 +1,8 @@
 module.exports = {
-    run: function(creep) {
+    run: function(creep, roomName) {
+        var energySourceFlag = Game.flags[roomName + ':' + creep.memory.energySource + ':' + roomName];
+        var containerFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
+
         if (creep.carry.energy < creep.carryCapacity) {
             var source = creep.pos.findClosestByPath(FIND_SOURCES);
 

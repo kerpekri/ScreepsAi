@@ -4,12 +4,19 @@ module.exports = {
         var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room]
 
         if(attackFlag){
-                var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-                var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
-                var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
+            var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
+            var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES);
 
             if(creep.room == attackFlag.room) {
-                if(hostileCreeps) {
+                /*if(healerCreep) {
+                    if(creep.rangedAttack(healerCreep) == ERR_NOT_IN_RANGE) {
+                        creep.heal(healerCreep); // damaged creep!
+                        creep.moveTo(healerCreep);
+                    }
+
+                }*/
+                if(1 == 1) {
                     var target = creep.pos.findClosestByRange(FIND_MY_CREEPS, {
                         filter: function(object) {
                             return object.hits < object.hitsMax;

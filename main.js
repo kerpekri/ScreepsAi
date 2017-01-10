@@ -54,12 +54,12 @@ module.exports.loop = function () {
             // long distance units
             var minimumNumberOfRoomExplorers = 1;
             var minimumNumberOfClaimers = 1;
-            var minimumNumberOfLongDistanceBuilders = 1;
+            var minimumNumberOfLongDistanceBuilders = 0;
             var minimumNumberOfLongDistanceMiners = 1;
             var minimumNumberOfLongDistanceTransporters = 1;
 
             // attack & defense units
-            var minimumNumberOfAttackers = 2;
+            var minimumNumberOfAttackers = 0;
             var minimumNumberOfHealers = 0;
 
 
@@ -99,6 +99,10 @@ module.exports.loop = function () {
 
                 name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'transporter', flagIndex);
             }
+            else if (numberOfMaintenanceGuys < minimumNumberOfMaintenanceGuys) {
+                flagIndex = 'test';
+                name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'maintenanceGuy', flagIndex);
+            }
             else if (numberOfUpgraders < minimumNumberOfUpgraders) {
                 name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'upgrader', '1');
             }
@@ -128,8 +132,8 @@ module.exports.loop = function () {
             }
             else if (numberOfLongDistanceAttackers < minimumNumberOfAttackers) {
                 name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH,
-                                                         MOVE, MOVE, MOVE, MOVE, MOVE,
-                                                         ATTACK, ATTACK],
+                                                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                         ATTACK, ATTACK, ATTACK, ATTACK],
                     {role: 'attacker',
                      home_room: homeRoom});
                 /*name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
@@ -141,86 +145,91 @@ module.exports.loop = function () {
                      home_room: homeRoom});*/
             }
             else if (numberOfHealers < minimumNumberOfHealers) {
-                name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL],
+                name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE,
+                                                         HEAL, HEAL],
                     {role: 'healer',
                      home_room: homeRoom});
-            }
-            else if (numberOfMaintenanceGuys < minimumNumberOfMaintenanceGuys) {
-                flagIndex = 'test';
-                name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'maintenanceGuy', flagIndex);
+                /*name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                         HEAL, HEAL, HEAL, HEAL, HEAL, HEAL],
+                    {role: 'healer',
+                     home_room: homeRoom});*/
             }
             else if (numberOfWallRepairers < minimumNumberOfWallRepairers) {
                 // good body part RATIO!
                 name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK], {role: 'wallRepairer',  working: false});
             }
 
+            atTheMomentAvailableEnergy = Game.spawns['TX-HQ'].room.energyAvailable;
             nextAvailableRooms = _.values(Game.map.describeExits(room.name));
 
-            // send roomExplorer creep to all available rooms next to spawn room
-            for (var nextAvailableRoomName of nextAvailableRooms) {
-                //console.log(nextAvailableRoomName);
-                var numberOfRoomExplorers = _.sum(Game.creeps, (c) => c.memory.role == 'roomExplorer' &&
-                                                                      c.memory.targetRoom == nextAvailableRoomName);
+            if (atTheMomentAvailableEnergy > 1200) {
+                // send roomExplorer creep to all available rooms next to spawn room
+                for (var nextAvailableRoomName of nextAvailableRooms) {
+                    //console.log(nextAvailableRoomName);
+                    var numberOfRoomExplorers = _.sum(Game.creeps, (c) => c.memory.role == 'roomExplorer' &&
+                                                                          c.memory.targetRoom == nextAvailableRoomName);
 
-                var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer' &&
-                                                                 c.memory.targetRoom == nextAvailableRoomName);
+                    var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer' &&
+                                                                     c.memory.targetRoom == nextAvailableRoomName);
 
-                /*var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder' &&
-                                                                             c.memory.targetRoom == nextAvailableRoomName);*/
+                    /*var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder' &&
+                                                                                 c.memory.targetRoom == nextAvailableRoomName);*/
 
-                var numberOfLongDistanceTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceTransporter' &&
-                                                                                 c.memory.targetRoom == nextAvailableRoomName);
+                    var numberOfLongDistanceTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceTransporter' &&
+                                                                                     c.memory.targetRoom == nextAvailableRoomName);
 
-                var numberOfLongDistanceMiners = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceMiner' &&
-                                                                           c.memory.targetRoom == nextAvailableRoomName);
+                    var numberOfLongDistanceMiners = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceMiner' &&
+                                                                               c.memory.targetRoom == nextAvailableRoomName);
 
-                if (numberOfRoomExplorers < minimumNumberOfRoomExplorers) {
-                    // pagaidām atstājam, ka ir hardcoded spawn
-                    Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, ATTACK],
-                                                            {role: 'roomExplorer',
-                                                             homeRoom: room.name,
-                                                             targetRoom: nextAvailableRoomName});
-                }
-                /*else if (numberOfLongDistanceBuilders < minimumNumberOfLongDistanceBuilders) {
-                    name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, WORK, WORK],
-                            {role: 'longDistanceBuilder',
-                             homeRoom: room.name,
-                             targetRoom: nextAvailableRoomName});
-                }*/
-                else if (numberOfLongDistanceMiners < minimumNumberOfLongDistanceMiners) {
-                    name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'longDistanceMiner',
-                        {role: 'longDistanceMiner',
-                         homeRoom: room.name,
-                         targetRoom: nextAvailableRoomName});
-                }
-                else if (numberOfLongDistanceTransporters < minimumNumberOfLongDistanceTransporters) {
-                    name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                                            CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
-                        {role: 'longDistanceTransporter',
-                         homeRoom: room.name,
-                         targetRoom: nextAvailableRoomName});
-                }
-                else if (numberOfClaimers < minimumNumberOfClaimers) {
-                    if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room == undefined) {
-                        name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
-                            {role: 'claimer',
+                    if (numberOfRoomExplorers < minimumNumberOfRoomExplorers) {
+                        // pagaidām atstājam, ka ir hardcoded spawn
+                        Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, ATTACK],
+                                                                {role: 'roomExplorer',
+                                                                 homeRoom: room.name,
+                                                                 targetRoom: nextAvailableRoomName});
+                    }
+                    /*else if (numberOfLongDistanceBuilders < minimumNumberOfLongDistanceBuilders) {
+                        name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, CARRY, WORK, WORK],
+                                {role: 'longDistanceBuilder',
+                                 homeRoom: room.name,
+                                 targetRoom: nextAvailableRoomName});
+                    }*/
+                    else if (numberOfLongDistanceMiners < minimumNumberOfLongDistanceMiners) {
+                        name = Game.spawns['TX-HQ'].createCreep([WORK, WORK, WORK, WORK, WORK,
+                                                                 CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
+                            {role: 'longDistanceMiner',
                              homeRoom: room.name,
                              targetRoom: nextAvailableRoomName});
                     }
-                    else if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room.controller.reservation == undefined) {
-                        name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
-                            {role: 'claimer',
+                    else if (numberOfLongDistanceTransporters < minimumNumberOfLongDistanceTransporters) {
+                        name = Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                                CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+                            {role: 'longDistanceTransporter',
                              homeRoom: room.name,
                              targetRoom: nextAvailableRoomName});
                     }
-                    else if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room.controller.reservation.ticksToEnd < 200) {
-                        name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
-                            {role: 'claimer',
-                             homeRoom: room.name,
-                             targetRoom: nextAvailableRoomName});
+                    else if (numberOfClaimers < minimumNumberOfClaimers) {
+                        if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room == undefined) {
+                            name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                                {role: 'claimer',
+                                 homeRoom: room.name,
+                                 targetRoom: nextAvailableRoomName});
+                        }
+                        else if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room.controller.reservation == undefined) {
+                            name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                                {role: 'claimer',
+                                 homeRoom: room.name,
+                                 targetRoom: nextAvailableRoomName});
+                        }
+                        else if (Game.flags[nextAvailableRoomName + ':ReserveController:' + room.name].room.controller.reservation.ticksToEnd < 200) {
+                            name = Game.spawns['TX-HQ'].createCreep([CLAIM, CLAIM, MOVE, MOVE],
+                                {role: 'claimer',
+                                 homeRoom: room.name,
+                                 targetRoom: nextAvailableRoomName});
+                        }
                     }
                 }
+
             }
 
             // find all towers in specific room
@@ -261,17 +270,18 @@ module.exports.loop = function () {
                 }
             };
 
-            runRoles();
+            runRoles(room.name);
         }
     }
 
-    function runRoles() {
+    function runRoles(roomName) {
+        //console.log(roomName);
         for (let name in Game.creeps) {
             // access all creep properties in loop
             var creep = Game.creeps[name];
 
             if (creep.memory.role == 'miner') {
-                roleMiner.run(creep);
+                roleMiner.run(creep, roomName);
             }
             else if (creep.memory.role == 'transporter') {
                 roleTransporter.run(creep);

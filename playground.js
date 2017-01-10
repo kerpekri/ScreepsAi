@@ -58,7 +58,7 @@ Game.spawns['TX-HQ'].createCreep([CARRY, CARRY, MOVE, MOVE], { role: 'transporte
 
 longDistanceBuilder
 
-Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY], { role: 'maintenanceGuy', flagIndex: 'sourceOneContainer'})
+Game.spawns['TX-HQ'].createCreep([MOVE, MOVE, CARRY], { role: 'transporter', flagIndex: 'sourceOneContainer'})
 Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'miner', flagIndex);
 name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'maintenanceGuy', 'test');
 name = Game.spawns['TX-HQ'].createCustomCreep(maximum_available_energy, 'transporter', flagIndex: 'sourceOneContainer');

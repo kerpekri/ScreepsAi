@@ -48,10 +48,20 @@ module.exports = {
                 filter: s => s.structureType == STRUCTURE_CONTAINER
             });
 
-            if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.say('transfer C');
-                creep.moveTo(container);
+            if (_.sum(container.store) > 1600) {
+                var storage = creep.room.storage;
+
+                if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(storage);
+                }
             }
+            else {
+                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('transferC');
+                    creep.moveTo(container);
+                }
+            }
+
         }
 
 

@@ -5,7 +5,7 @@ module.exports = {
 
         if(explorerFlag){
             if(creep.room == explorerFlag.room) {
-                if (creep.carry.energy > 0) {
+                if (creep.carry.energy == creep.carryCapacity) {
                     var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{
                         filter: (s) => s.structureType == STRUCTURE_CONTAINER
                     });

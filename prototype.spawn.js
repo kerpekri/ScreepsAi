@@ -7,7 +7,7 @@ module.exports = function() {
             if (roleName == 'miner') {
                 if (energy_available > 600) {
                     // 6W 2M 1C - body part count
-                    energy_available = 750;
+                    energy_available = 700;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
@@ -26,6 +26,8 @@ module.exports = function() {
                 // only now needed
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
                 var body = allPartsTogether.split(",");
+
+                console.log(this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex}));
 
                 return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex});
             }
@@ -86,14 +88,14 @@ module.exports = function() {
             }
             else if (roleName == 'upgrader') {
                 if (energy_available > 600) {
-                    energy_available = 1350;
+                    energy_available = 1050; // NEAIZTIEC!
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
                 var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
                 //var allowedMoveParts = BODYPARTS_ALL[0];
-                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 6).slice(0,-1);
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 4).slice(0,-1);
                 var allowedCarryParts = BODYPARTS_ALL[2];
                 var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
 
