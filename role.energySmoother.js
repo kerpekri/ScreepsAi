@@ -3,13 +3,27 @@ module.exports = {
         // flag name - E78N18:backupContainer:E78N18
         // backup containers ir tas pats kas room controllers container!
         var backupContainerFlag = Game.flags[roomName + ':' + 'backupContainer' + ':' + roomName];
-
+        creep.say('xxx');
         if (creep.carry.energy == 0) {
-            var storage = creep.room.storage;
+            var targetLinkFlagPos = Game.flags[roomName + ':' + 'targetLink' + ':' + roomName].pos;
 
-            if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.say('withdraw');
-                creep.moveTo(storage);
+            var targetLink = targetLinkFlagPos.findClosestByPath(FIND_STRUCTURES, {
+                filter: s => (s.structureType == STRUCTURE_LINK && s.energy != 0)
+            });
+
+            if (targetLink != undefined) {
+                if (creep.withdraw(targetLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(targetLink);
+                }
+            }
+            else {
+                var storage = creep.room.storage;
+
+                if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(storage);
+                }
             }
         }
         else if (creep.carryCapacity == creep.carryCapacity) {

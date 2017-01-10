@@ -46,7 +46,7 @@ module.exports.loop = function () {
             var minimumNumberOfMiners = 2; // always 2
             var minimumNumberOfTransporters = 2; // always 2
             var minimumNumberOfEnergySmoothers = 1; // always 1
-            var minimumNumberOfMaintenanceGuys = 2; // always 2
+            var minimumNumberOfMaintenanceGuys = 3; // always 3
             var minimumNumberOfUpgraders = 2; // always 2 #
             var minimumNumberOfBuilders = 1;
 
@@ -178,11 +178,16 @@ module.exports.loop = function () {
                             roomName);
             }
             else if (numberOfLongDistanceAttackers < minimumNumberOfAttackers) {
-                name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH,
+                name = Game.spawns['TX-HQ'].createCreep([
+                                                         MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                         ATTACK, ATTACK, ATTACK, ATTACK, ATTACK, ATTACK],
+                    {role: 'attacker',
+                     home_room: homeRoom});
+                /*name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH,
                                                          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
                                                          ATTACK, ATTACK, ATTACK, ATTACK],
                     {role: 'attacker',
-                     home_room: homeRoom});
+                     home_room: homeRoom});*/
                 /*name = Game.spawns['TX-HQ'].createCreep([TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
                                                          TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH, TOUGH,
                                                          MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,MOVE,
@@ -207,13 +212,13 @@ module.exports.loop = function () {
                 {role: 'wallRepairer',  working: false});
             }
 
-            atTheMomentAvailableEnergy = Game.spawns['TX-HQ'].room.energyAvailable;
+            atTheMomentAvailableEnergy = Game.spawns['TX-HQ'].room.energyCapacityAvailable;
             nextAvailableRooms = _.values(Game.map.describeExits(room.name));
 
             if (atTheMomentAvailableEnergy > 1200) {
                 // send roomExplorer creep to all available rooms next to spawn room
                 for (var nextAvailableRoomName of nextAvailableRooms) {
-                    //console.log(nextAvailableRoomName);
+
                     var numberOfRoomExplorers = _.sum(Game.creeps, (c) => c.memory.role == 'roomExplorer' &&
                                                                           c.memory.targetRoom == nextAvailableRoomName);
 
@@ -281,7 +286,7 @@ module.exports.loop = function () {
             }
 
             // find all towers in specific room
-            var towers = Game.rooms.E78N18.find(FIND_STRUCTURES, {
+            var towers = Game.rooms[roomName].find(FIND_STRUCTURES, {
                 filter: (s) => s.structureType == STRUCTURE_TOWER
             });
 
@@ -318,12 +323,29 @@ module.exports.loop = function () {
                 }
             };
 
+            var links = Game.rooms[roomName].find(FIND_STRUCTURES, {
+                filter: (s) => (s.structureType == STRUCTURE_LINK && s.energy > 0)
+            });
+
+            for (let link of links) {
+                var targetLinkFlagPos = Game.flags[roomName + ':' + 'targetLink' + ':' + roomName].pos;
+
+                var targetLink = targetLinkFlagPos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_LINK
+                });
+
+                if (targetLink != undefined) {
+                    if (link.cooldown == 0 && ((targetLink.energyCapacity - targetLink.energy) >= link.energy)) {
+                        link.transferEnergy(targetLink);
+                    }
+                }
+            };
+
             runRoles(room.name);
         }
     }
 
     function runRoles(roomName) {
-        //console.log(roomName);
         for (let name in Game.creeps) {
             // access all creep properties in loop
             var creep = Game.creeps[name];

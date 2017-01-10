@@ -2,7 +2,7 @@ module.exports = {
     run: function(creep) {
         var explorerFlag = Game.flags[creep.memory.targetRoom + ':ExploreRoom:' + creep.memory.homeRoom];
         var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
-        var containerFlag = Game.flags[creep.memory.homeRoom + ':Container:' + creep.memory.targetRoom];
+        var roomStorageFlag = Game.flags[creep.memory.homeRoom + ':Container:' + creep.memory.targetRoom];
 
         if(explorerFlag){
             if(creep.room == explorerFlag.room) {
@@ -23,16 +23,16 @@ module.exports = {
                 }
             }
             else if (creep.room == homeFlag.room && creep.carry.energy == creep.carryCapacity) {
-                if (creep.moveTo(containerFlag) == 0) {
-                    let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER &&
-                                     s.store[RESOURCE_ENERGY] != 2000
+                if (creep.moveTo(roomStorageFlag) == 0) {
+                    let building = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER ||
+                                     (s.structureType == STRUCTURE_LINK && s.energy != 800)
                     });
 
-                    if (container != undefined) {
+                    if (building != undefined) {
                         creep.say('transfer');
-                        if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(container);
+                        if (creep.transfer(building, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(building);
                         }
                         else {
                             creep.say('fill storage');
@@ -45,7 +45,7 @@ module.exports = {
                     }
                 }
                 else {
-                    creep.moveTo(containerFlag);
+                    creep.moveTo(roomStorageFlag);
                 }
             }
             else {
