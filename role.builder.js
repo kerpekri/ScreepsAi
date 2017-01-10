@@ -1,68 +1,36 @@
 module.exports = {
-    run: function(creep) {
-        /*
-            working - get energy back to HQ
-            not_working - go to source -> get energy
-        */
+    run: function(creep, roomName) {
+        if (creep.carry.energy == 0) {
+            var storage = creep.room.storage;
 
-        // the creep is working right now and no energy left
-        if (creep.memory.working == true && creep.carry.energy == 0) {
-            creep.memory.working = false;
+            if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.say('withdraw');
+                creep.moveTo(storage);
+            }
         }
-        // we are not working and creep is full of energy get back to HQ
-        else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
-            creep.memory.working = true;
-         }
-
-        // if it is working
-        if (creep.memory.working == true) {
-            creep.say('build');
-            // find closest construction Site
+        else {
             var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
 
-            // check if we have ANY construction site available and skip RAMPART
-            if (constructionSite != undefined &&
-                constructionSite != STRUCTURE_RAMPART) {
-                // if not in range
+            if (constructionSite != undefined) {
                 if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    // move to construction site
-                    creep.moveTo(constructionSite);
-                }
-            }
-            // if there aren't any construction sites and there A RAMPART available
-            else if (constructionSite != undefined && constructionSite == STRUCTURE_RAMPART) {
-                creep.say('build ram');
-                // if not in range
-                if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    // move to construction site
+                    creep.say('build');
                     creep.moveTo(constructionSite);
                 }
             }
             else {
-                creep.say('rep rampart');
-                var damagedRampart = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (i) => i.structureType == STRUCTURE_RAMPART && i.hits < 10001
+                var damagedDefence = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (i) => i.structureType == STRUCTURE_WALL ||
+                                   i.structureType == STRUCTURE_RAMPART &&
+                                   i.hits < 100000 // todo is this a good idea?
                 });
 
-                if (damagedRampart != undefined) {
-                    if (creep.repair(damagedRampart) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(damagedRampart);
+                if (damagedDefence != undefined) {
+                    if (creep.repair(damagedDefence) == ERR_NOT_IN_RANGE) {
+                        creep.say('repair');
+                        creep.moveTo(damagedDefence);
                     }
                 }
             }
         }
-        // not_working state
-        else {
-            creep.say('get energy');
-            // pos object - good one, a lot of good build-in functions
-            // find closest energy source
-            var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-
-            // harvest source, if not in range go closer.
-            if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                // if we are not in range move closer to source destination
-                creep.moveTo(source);
-            }
-        }
     }
-};
+}

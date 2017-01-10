@@ -1,19 +1,23 @@
 module.exports = function() {
-    // Custom function for creating creep body
     StructureSpawn.prototype.createCustomCreep =
-        function (energy_available, roleName, flagIndex) {
+        function (energyAvailable,
+                  roleName,
+                  roomName,
+                  energySource,
+                  sourceContainer,
+                  flagName) {
             var body = [];
 
             if (roleName == 'miner') {
-                if (energy_available > 600) {
+                if (energyAvailable > 600) {
                     // 6W 2M 1C - body part count
-                    energy_available = 700;
+                    energyAvailable = 700;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
-                var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
+                var workPartCount = Math.floor((energyAvailable - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
-                if (energy_available > 600) {
+                if (energyAvailable > 600) {
                     // 5W 3M 1C - body part count
                     var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 3).slice(0,-1);
                 }
@@ -27,17 +31,18 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
                 var body = allPartsTogether.split(",");
 
-                console.log(this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex}));
-
-                return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex});
+                return this.createCreep(body, undefined, { role: roleName,
+                                                           roomName: roomName,
+                                                           energySource: energySource,
+                                                           sourceContainer: sourceContainer});
             }
             else if (roleName == 'transporter') {
-                if (energy_available > 600) {
-                    energy_available = 450;
+                if (energyAvailable > 600) {
+                    energyAvailable = 300;
                 }
 
                 var energyNeededForCarryAndMoveParts =  (BODYPART_COST['carry'] * 2) + BODYPART_COST['move'];
-                var movePartCount = Math.floor(energy_available / energyNeededForCarryAndMoveParts);
+                var movePartCount = Math.floor(energyAvailable / energyNeededForCarryAndMoveParts);
                 var carryPartCount = movePartCount * 2;
 
 
@@ -53,18 +58,42 @@ module.exports = function() {
                                         undefined,
                                         {
                                             role: roleName,
-                                            GetEnergyFromContainer: true,
-                                            MoveEnergyToContainer: false,
-                                            flagIndex: flagIndex
+                                            roomName: roomName,
+                                            sourceContainer: sourceContainer
                                         });
             }
-            else if (roleName == 'maintenanceGuy') {
-                if (energy_available > 600) {
-                    energy_available = 450;
+            else if (roleName == 'energySmoother') {
+                if (energyAvailable > 600) {
+                    energyAvailable = 300;
                 }
 
                 var energyNeededForCarryAndMoveParts =  (BODYPART_COST['carry'] * 2) + BODYPART_COST['move'];
-                var movePartCount = Math.floor(energy_available / energyNeededForCarryAndMoveParts);
+                var movePartCount = Math.floor(energyAvailable / energyNeededForCarryAndMoveParts);
+                var carryPartCount = movePartCount * 2;
+
+
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', movePartCount).slice(0,-1);
+                var allowedCarryParts = _.repeat(BODYPARTS_ALL[2] + ',', carryPartCount).slice(0,-1);
+
+
+                // only now needed
+                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts
+                var body = allPartsTogether.split(",");
+
+                return this.createCreep(body,
+                                        undefined,
+                                        {
+                                            role: roleName,
+                                            roomName: roomName
+                                        });
+            }
+            else if (roleName == 'maintenanceGuy') {
+                if (energyAvailable > 600) {
+                    energyAvailable = 450;
+                }
+
+                var energyNeededForCarryAndMoveParts =  (BODYPART_COST['carry'] * 2) + BODYPART_COST['move'];
+                var movePartCount = Math.floor(energyAvailable / energyNeededForCarryAndMoveParts);
                 var carryPartCount = movePartCount * 2;
 
 
@@ -81,18 +110,16 @@ module.exports = function() {
                                         undefined,
                                         {
                                             role: roleName,
-                                            GetEnergyFromContainer: true,
-                                            MoveEnergyToContainer: false,
-                                            flagIndex: flagIndex
+                                            roomName: roomName
                                         });
             }
             else if (roleName == 'upgrader') {
-                if (energy_available > 600) {
-                    energy_available = 1050; // NEAIZTIEC!
+                if (energyAvailable > 600) {
+                    energyAvailable = 1050; // NEAIZTIEC!
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
-                var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
+                var workPartCount = Math.floor((energyAvailable - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
                 //var allowedMoveParts = BODYPARTS_ALL[0];
                 var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 4).slice(0,-1);
@@ -103,7 +130,7 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body, undefined, { role: roleName, closeToController: false});
+                return this.createCreep(body, undefined, { role: roleName, roomName: roomName });
             }
             else if (roleName == 'homeHarvester') {
                 // TESTED - 700 energy ieguvums no viena creepa
@@ -118,10 +145,30 @@ module.exports = function() {
                 var allowedWorkParts = [WORK, WORK]; // 2
             }*/
             else if (roleName == 'builder') {
-                // TESTED - 700 energy ieguvums no viena creepa
-                var allowedMoveParts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]; // 6
-                var allowedCarryParts = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]; // 7
-                var allowedWorkParts = [WORK, WORK, WORK, WORK]; // 4
+                if (energyAvailable > 600) {
+                    energyAvailable = 450;
+                }
+
+                var energyNeededForCarryAndMoveParts =  (BODYPART_COST['carry'] * 2) + BODYPART_COST['move'];
+                var movePartCount = Math.floor(energyAvailable / energyNeededForCarryAndMoveParts);
+                var carryPartCount = movePartCount * 2;
+
+
+                var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 4).slice(0,-1);
+                var allowedCarryParts = _.repeat(BODYPARTS_ALL[2] + ',', 6).slice(0,-1);
+                var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', 2).slice(0,-1);
+
+
+                // only now needed
+                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
+                var body = allPartsTogether.split(",");
+
+                return this.createCreep(body,
+                                        undefined,
+                                        {
+                                            role: roleName,
+                                            roomName: roomName
+                                        });
             }
             else if (roleName == 'repairer') {
                 // TESTED - 700 energy ieguvums no viena creepa
@@ -136,15 +183,15 @@ module.exports = function() {
                 var allowedWorkParts = [WORK, WORK, WORK, WORK]; // 4
             }
             else if (roleName == 'longDistanceMiner') {
-                if (energy_available > 600) {
+                if (energyAvailable > 600) {
                     // 6W 2M 1C - body part count
-                    energy_available = 750;
+                    energyAvailable = 750;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
-                var workPartCount = Math.floor((energy_available - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
+                var workPartCount = Math.floor((energyAvailable - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
-                if (energy_available > 600) {
+                if (energyAvailable > 600) {
                     // 5W 3M 1C - body part count
                     var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 3).slice(0,-1);
                 }
@@ -158,7 +205,7 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagIndex})
+                return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagName})
             }
 
             if (roleName != 'miner' ) {

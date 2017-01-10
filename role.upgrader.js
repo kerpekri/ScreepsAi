@@ -1,30 +1,24 @@
 module.exports = {
-    run: function(creep) {
-        if (creep.memory.closeToController == false) {
-            // somehow we need to specify flags dynamic
-            var path = creep.pos.findPathTo(Game.flags.controllerContainer);
+    run: function(creep, roomName) {
+        // flag name - E78N18:backupContainer:E78N18
+        // backup containers ir tas pats kas room controllers container!
+        var backupContainerFlag = Game.flags[roomName + ':' + 'backupContainer' + ':' + roomName];
 
-            if (path.length > 1) {
-                creep.move(path[0].direction);
-            }
-            else {
-                creep.memory.closeToController = true;
-            }
-        }
-        else if (creep.memory.closeToController == true && creep.carry.energy == 0) {
-            let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+        if (creep.carry.energy == 0) {
+            var pos = backupContainerFlag.pos;
+
+            var container = pos.findClosestByPath(FIND_STRUCTURES, {
                 filter: s => s.structureType == STRUCTURE_CONTAINER
             });
 
-            if (container != undefined) {
-                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
-                }
+            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                creep.say('withdraw');
+                creep.moveTo(backupContainerFlag);
             }
         }
         else {
             if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                //if not in range for transferring move to room's controller
+                creep.say('upgrade');
                 creep.moveTo(creep.room.controller);
             }
         }
