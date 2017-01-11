@@ -5,7 +5,9 @@ module.exports = function() {
                   roomName,
                   energySource,
                   sourceContainer,
-                  flagName) {
+                  flagName,
+                  homeRoom,
+                  targetRoom) {
             var body = [];
 
             if (roleName == 'miner') {
@@ -127,7 +129,7 @@ module.exports = function() {
                 var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
 
                 // only now needed
-                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
+                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts + ',move'
                 var body = allPartsTogether.split(",");
 
                 return this.createCreep(body, undefined, { role: roleName, roomName: roomName });
@@ -185,7 +187,7 @@ module.exports = function() {
             else if (roleName == 'longDistanceMiner') {
                 if (energyAvailable > 600) {
                     // 6W 2M 1C - body part count
-                    energyAvailable = 750;
+                    energyAvailable = 700;
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
@@ -202,10 +204,12 @@ module.exports = function() {
                 var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
 
                 // only now needed
-                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
+                var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts + ',move' + ',move' + ',move'
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body, undefined, { role: roleName, closeToSource: false, flagIndex: flagName})
+                return this.createCreep(body, undefined, { role: roleName,
+                                                           homeRoom: roomName,
+                                                           targetRoom: targetRoom});
             }
 
             if (roleName != 'miner' ) {
