@@ -7,7 +7,8 @@ module.exports = {
             if(creep.room == explorerFlag.room) {
                 if (creep.carry.energy == creep.carryCapacity) {
                     var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{
-                        filter: (s) => s.structureType == STRUCTURE_CONTAINER
+                        filter: (s) => s.structureType == STRUCTURE_CONTAINER ||
+                                       s.structureType == STRUCTURE_SPAWN
                     });
 
                     var damagedContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
@@ -35,6 +36,12 @@ module.exports = {
                         if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                             creep.say('transfer');
                             creep.moveTo(container);
+                        }
+                        else {
+                            creep.say('dropAll');
+                            for(var resourceType in creep.carry) {
+                                creep.drop(resourceType);
+                            }
                         }
                     }
                 }

@@ -7,25 +7,31 @@ module.exports = function() {
                   sourceContainer,
                   flagName,
                   homeRoom,
-                  targetRoom) {
+                  targetRoom,
+                  sourceId,
+                  containerId) {
+
             var body = [];
 
             if (roleName == 'miner') {
-                if (energyAvailable > 600) {
+                if (energyAvailable > 700) {
                     // 6W 2M 1C - body part count
                     energyAvailable = 700;
+                }
+                else {
                 }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
                 var workPartCount = Math.floor((energyAvailable - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
 
-                if (energyAvailable > 600) {
+                if (energyAvailable > 700) {
                     // 5W 3M 1C - body part count
                     var allowedMoveParts = _.repeat(BODYPARTS_ALL[0] + ',', 3).slice(0,-1);
                 }
                 else {
                     var allowedMoveParts = BODYPARTS_ALL[0];
                 }
+
                 var allowedCarryParts = BODYPARTS_ALL[2];
                 var allowedWorkParts = _.repeat(BODYPARTS_ALL[1] + ',', workPartCount).slice(0,-1);
 
@@ -33,10 +39,7 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body, undefined, { role: roleName,
-                                                           roomName: roomName,
-                                                           energySource: energySource,
-                                                           sourceContainer: sourceContainer});
+                return this.createCreep(body, undefined, { role: roleName, sourceId: sourceId});
             }
             else if (roleName == 'transporter') {
                 if (energyAvailable > 600) {
@@ -56,16 +59,13 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body,
-                                        undefined,
-                                        {
-                                            role: roleName,
-                                            roomName: roomName,
-                                            sourceContainer: sourceContainer
-                                        });
+                return this.createCreep(body, undefined, {role: roleName, containerId: containerId});
             }
             else if (roleName == 'energySmoother') {
                 if (energyAvailable > 600) {
+                    energyAvailable = 300;
+                }
+                else {
                     energyAvailable = 300;
                 }
 
@@ -119,6 +119,9 @@ module.exports = function() {
                 if (energyAvailable > 600) {
                     energyAvailable = 1050; // NEAIZTIEC!
                 }
+                else {
+                    energyAvailable = 300;
+                }
 
                 var energyNeededForCarryAndMoveParts =  BODYPART_COST['move'] +  BODYPART_COST['carry'];
                 var workPartCount = Math.floor((energyAvailable - energyNeededForCarryAndMoveParts) / BODYPART_COST['work']);
@@ -134,11 +137,10 @@ module.exports = function() {
 
                 return this.createCreep(body, undefined, { role: roleName, roomName: roomName });
             }
-            else if (roleName == 'homeHarvester') {
-                // TESTED - 700 energy ieguvums no viena creepa
-                var allowedMoveParts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]; // 6
-                var allowedCarryParts = [CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY]; // 7
-                var allowedWorkParts = [WORK, WORK, WORK, WORK]; // 4
+            else if (roleName == 'harvester') {
+                var allowedMoveParts = [MOVE, MOVE];
+                var allowedCarryParts = [CARRY];
+                var allowedWorkParts = [WORK, WORK];
             }
             /*else if (roleName == 'longDistanceHarvester') {
                 // NOT - TESTED

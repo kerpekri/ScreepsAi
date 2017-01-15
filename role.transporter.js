@@ -1,38 +1,45 @@
 module.exports = {
     run: function(creep, roomName) {
-        // flag name - E78N18:sourceOneContainer:E78N18
-        var energyContainerFlag = Game.flags[roomName + ':' + creep.memory.sourceContainer + ':' + roomName];
-        // flag name - E78N18:backupContainer:E78N18
-        // todo pagaidam netiek izmanots flags, jo kada iespeja ka storage bus full??
-        var backupContainerFlag = Game.flags[roomName + ':' + 'backupContainer' + ':' + roomName];
-
         if (creep.carry.energy == 0) {
-            var pos = energyContainerFlag.pos;
-
-            var container = pos.findClosestByPath(FIND_STRUCTURES, {
-                filter: s => s.structureType == STRUCTURE_CONTAINER
+            let energyOnFloor = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
+                filter: s => s.energy > 50
             });
 
-            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.say('withdraw');
-                creep.moveTo(energyContainerFlag);
+            if (energyOnFloor != undefined) {
+                if (creep.pickup(energyOnFloor, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(energyOnFloor);
+                }
+            }
+            else {
+                let container = Game.getObjectById(creep.memory.containerId);
+
+                if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(container);
+                }
             }
         }
-        // todo varetu pielikt ka vins negaidi un uz creep.carryCapacity / 2 dodas jau prom no containera!
         else if (creep.carryCapacity == creep.carryCapacity) {
             var storage = creep.room.storage;
 
-            if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(storage);
-            }
-            /* todo varbut vajadzigs, ja storage ir full? bet kada iespeja!
-            if (_.sum(container.store) > 1600) {
-                var storage = creep.room.storage;
+            if (storage == undefined) {
+                var spawn = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (s) => s.structureType == STRUCTURE_SPAWN
+                });
 
+                let container = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
+                    filter: s => s.structureType == STRUCTURE_CONTAINER
+                })[0];
+
+                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(container);
+                }
+            }
+            else {
                 if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.moveTo(storage);
                 }
-            }*/
+            }
         }
     }
 };

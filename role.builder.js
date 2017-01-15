@@ -19,9 +19,8 @@ module.exports = {
             }
             else {
                 var damagedDefence = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (i) => i.structureType == STRUCTURE_WALL ||
-                                   i.structureType == STRUCTURE_RAMPART &&
-                                   i.hits < 100000 // todo is this a good idea?
+                    filter: (i) => (i.structureType == STRUCTURE_WALL && i.hits < 100000) ||
+                                   (i.structureType == STRUCTURE_RAMPART && i.hits < 100000) // todo is this a good idea?
                 });
 
                 if (damagedDefence != undefined) {
@@ -33,4 +32,4 @@ module.exports = {
             }
         }
     }
-}
+};

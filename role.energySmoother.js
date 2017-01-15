@@ -5,11 +5,13 @@ module.exports = {
         var backupContainerFlag = Game.flags[roomName + ':' + 'backupContainer' + ':' + roomName];
         creep.say('xxx');
         if (creep.carry.energy == 0) {
-            var targetLinkFlagPos = Game.flags[roomName + ':' + 'targetLink' + ':' + roomName].pos;
+            var targetLinkFlag = Game.flags[roomName + ':' + 'targetLink' + ':' + roomName];
 
-            var targetLink = targetLinkFlagPos.findClosestByPath(FIND_STRUCTURES, {
-                filter: s => (s.structureType == STRUCTURE_LINK && s.energy != 0)
-            });
+            if (targetLinkFlag != undefined) {
+                var targetLink = targetLinkFlag.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_LINK && s.energy != 0)
+                });
+            }
 
             if (targetLink != undefined) {
                 if (creep.withdraw(targetLink, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {

@@ -27,31 +27,21 @@ module.exports.loop = function () {
     for (var roomName in Game.rooms) {
         var room = Game.rooms[roomName];
 
+        if (room.name == 'E79N17') {
+            break;
+        }
+
         // only do something for rooms with spawn!
         if (room && room.find(FIND_MY_SPAWNS).length > 0) {
             if (room.controller.level <= 3) {
                 // 1 - 2 - 3lvl controller
-                var minimumNumberOfHarvesters = 4;
-                var minimumNumberOfRepairers = 1;
-
                 var minimumNumberOfMiners = 0; // always 2
                 var minimumNumberOfTransporters = 0; // always 2
                 var minimumNumberOfEnergySmoothers = 0; // always 1
-                var minimumNumberOfMaintenanceGuys = 0; // always 3
                 var minimumNumberOfUpgraders = 0; // always 2 #
-                var minimumNumberOfBuilders = 0;
-                // long distance units
-                var minimumNumberOfRoomExplorers = 0;
-                var minimumNumberOfClaimers = 0;
-                var minimumNumberOfLongDistanceBuilders = 0;
-                var minimumNumberOfLongDistanceMiners = 0;
-                var minimumNumberOfLongDistanceTransporters = 0;
-                // attack & defense units
-                var minimumNumberOfAttackers = 0;
-                var minimumNumberOfHealers = 0;
 
-                var numberOfHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'harvester');
-                var numberOfRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'repairer');
+                //var numberOfHarvesters = _.sum(Game.creeps, (c) => c.memory.role == 'harvester');
+                //var numberOfRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'repairer');
             }
             else if (room.controller.level > 3) {
                 // early game
@@ -65,7 +55,7 @@ module.exports.loop = function () {
                 var minimumNumberOfTransporters = 2; // always 2
                 var minimumNumberOfEnergySmoothers = 1; // always 1
                 var minimumNumberOfMaintenanceGuys = 3; // always 3
-                var minimumNumberOfUpgraders = 2; // always 2 #
+                var minimumNumberOfUpgraders = 3; // always 2 #
                 var minimumNumberOfBuilders = 1;
                 // long distance units
                 var minimumNumberOfRoomExplorers = 1;
@@ -78,29 +68,40 @@ module.exports.loop = function () {
                 var minimumNumberOfHealers = 1;
 
                 var numberOfMiners = _.sum(Game.creeps, (c) => c.memory.role == 'miner' &&
-                                                               c.memory.roomName == roomName);
+                                                               c.memory.roomName == roomName &&
+                                                               c.ticksToLive > 50);
 
-                var numberOfTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'transporter' &&
-                                                                     c.memory.roomName == roomName);
+                /*var numberOfTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'transporter' &&
+                                                                     c.memory.roomName == roomName &&
+                                                                     c.ticksToLive > 50);*/
 
                 var numberOfEnergySmoothers = _.sum(Game.creeps, (c) => c.memory.role == 'energySmoother' &&
-                                                                        c.memory.roomName == roomName);
+                                                                        c.memory.roomName == roomName &&
+                                                                        c.ticksToLive > 50);
 
                 var numberOfMaintenanceGuys = _.sum(Game.creeps, (c) => c.memory.role == 'maintenanceGuy' &&
-                                                                        c.memory.roomName == roomName);
+                                                                        c.memory.roomName == roomName &&
+                                                                        c.ticksToLive > 50);
 
                 var numberOfUpgraders = _.sum(Game.creeps, (c) => c.memory.role == 'upgrader' &&
-                                                                  c.memory.roomName == roomName);
+                                                                  c.memory.roomName == roomName &&
+                                                                  c.ticksToLive > 50);
 
                 var numberOfBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'builder' &&
-                                                                 c.memory.roomName == roomName);
+                                                                 c.memory.roomName == roomName &&
+                                                                 c.ticksToLive > 50);
 
                 var numberOfWallRepairers = _.sum(Game.creeps, (c) => c.memory.role == 'wallRepairer' &&
-                                                                      c.memory.roomName == roomName);
+                                                                      c.memory.roomName == roomName &&
+                                                                      c.ticksToLive > 50);
 
-                var numberOfLongDistanceAttackers = _.sum(Game.creeps, (c) => c.memory.role == 'attacker');
-                var numberOfHealers = _.sum(Game.creeps, (c) => c.memory.role == 'healer');
+                var numberOfLongDistanceAttackers = _.sum(Game.creeps, (c) => c.memory.role == 'attacker' &&
+                                                                              c.ticksToLive > 50);
+
+                var numberOfHealers = _.sum(Game.creeps, (c) => c.memory.role == 'healer' &&
+                                                                c.ticksToLive > 50);
             }
+
 
             var name = undefined;
 
@@ -109,9 +110,10 @@ module.exports.loop = function () {
             for (var spawn of AvailableSpawns) {
                 var maximum_available_energy = Game.spawns[spawn.name].room.energyCapacityAvailable;
 
-                if (numberOfMiners < minimumNumberOfMiners) {
+                if (numberOfMiners < 0) {
                     if (_.sum(Game.creeps, (c) => c.memory.role == 'miner' &&
                                                   c.memory.energySource == 'energySourceOne' &&
+                                                  c.ticksToLive > 50 &&
                                                   c.memory.roomName == roomName) == 1) {
 
                         energySource = 'energySourceTwo';
@@ -129,8 +131,9 @@ module.exports.loop = function () {
                                             energySource,
                                             sourceContainer);
                 }
-                else if (numberOfTransporters < minimumNumberOfTransporters) {
+                /*else if (numberOfTransporters < minimumNumberOfTransporters) {
                     if (_.sum(Game.creeps, (c) => c.memory.role == 'transporter' &&
+                                                  c.ticksToLive > 50 &&
                                                   c.memory.sourceContainer == 'sourceOneContainer') == 1) {
                         sourceContainer = 'sourceTwoContainer'
                     }
@@ -144,7 +147,7 @@ module.exports.loop = function () {
                                             roomName,
                                             '',
                                             sourceContainer);
-                }
+                }*/
                 else if (numberOfEnergySmoothers < minimumNumberOfEnergySmoothers) {
                     Game.spawns[spawn.name].createCustomCreep(
                                             maximum_available_energy,
@@ -163,7 +166,7 @@ module.exports.loop = function () {
                                             'upgrader',
                                             roomName);
                 }
-                else if (numberOfHarvesters < minimumNumberOfHarvesters) {
+                /*else if (numberOfHarvesters < minimumNumberOfHarvesters) {
                    name = Game.spawns[spawn.name].createCreep([WORK, CARRY, MOVE, MOVE, MOVE], { role: 'homeHarvester', working: false})
 
                     // if spawning failed and we have no harvesters left
@@ -173,14 +176,13 @@ module.exports.loop = function () {
                           //  Game.spawns[spawn.name].room.energyAvailable, 'homeHarvester');
                           name = Game.spawns[spawn.name].createCreep([WORK, CARRY, MOVE, MOVE, MOVE], { role: 'homeHarvester', working: false})
                     }
-                }
-
-                else if (numberOfRepairers < minimumNumberOfRepairers) {
+                }*/
+                /*else if (numberOfRepairers < minimumNumberOfRepairers) {
                     // spawn a new repairer creeep
                     //name = Game.spawns[spawn.name].createCustomCreep(maximum_available_energy, 'repairer');
                     name = Game.spawns[spawn.name].createCreep([WORK, CARRY, MOVE, MOVE, CARRY, CARRY, CARRY, MOVE, MOVE],
                     { role: 'repairer', working: false})
-                }
+                }*/
                 else if (numberOfBuilders < minimumNumberOfBuilders) {
                     Game.spawns[spawn.name].createCustomCreep(
                                 maximum_available_energy,
@@ -225,27 +227,39 @@ module.exports.loop = function () {
                 atTheMomentAvailableEnergy = Game.spawns[spawn.name].room.energyCapacityAvailable;
                 nextAvailableRooms = _.values(Game.map.describeExits(room.name));
 
-                //var claimRoom = ['E79N17'];
+                var claimRoom = ['E79N17'];
 
-                //nextAvailableRooms = nextAvailableRooms.concat(claimRoom);
+                nextAvailableRooms = nextAvailableRooms.concat(claimRoom);
 
                 if (atTheMomentAvailableEnergy > 1200) {
                     // send roomExplorer creep to all available rooms next to spawn room
                     for (var nextAvailableRoomName of nextAvailableRooms) {
+
                         var numberOfRoomExplorers = _.sum(Game.creeps, (c) => c.memory.role == 'roomExplorer' &&
-                                                                              c.memory.targetRoom == nextAvailableRoomName);
+                                                                              c.memory.targetRoom == nextAvailableRoomName &&
+                                                                              c.ticksToLive > 100);
 
                         var numberOfClaimers = _.sum(Game.creeps, (c) => c.memory.role == 'claimer' &&
                                                                          c.memory.targetRoom == nextAvailableRoomName);
 
-                        /*var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder' &&
-                                                                                     c.memory.targetRoom == nextAvailableRoomName);*/
+                        var numberOfLongDistanceBuilders = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceBuilder' &&
+                                                                                     c.memory.targetRoom == nextAvailableRoomName);
 
                         var numberOfLongDistanceTransporters = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceTransporter' &&
-                                                                                         c.memory.targetRoom == nextAvailableRoomName);
+                                                                                         c.memory.targetRoom == nextAvailableRoomName &&
+                                                                                         c.ticksToLive > 100);
 
                         var numberOfLongDistanceMiners = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceMiner' &&
-                                                                                   c.memory.targetRoom == nextAvailableRoomName);
+                                                                                   c.memory.targetRoom == nextAvailableRoomName &&
+                                                                                    c.ticksToLive > 100);
+
+                        if (nextAvailableRoomName == 'E79N17') {
+                            var minimumNumberOfRoomExplorers = 1;
+                            var minimumNumberOfClaimers = 0;
+                            var minimumNumberOfLongDistanceBuilders = 4;
+                            var minimumNumberOfLongDistanceMiners = 0;
+                            var minimumNumberOfLongDistanceTransporters = 0;
+                        }
 
                         if (numberOfRoomExplorers < minimumNumberOfRoomExplorers) {
                             // pagaidām atstājam, ka ir hardcoded spawn
@@ -256,12 +270,13 @@ module.exports.loop = function () {
                                                                      homeRoom: room.name,
                                                                      targetRoom: nextAvailableRoomName});
                         }
-                        /*else if (numberOfLongDistanceBuilders < minimumNumberOfLongDistanceBuilders) {
-                            name = Game.spawns[spawn.name].createCreep([MOVE, MOVE, MOVE, CARRY, WORK, WORK],
+                        else if (numberOfLongDistanceBuilders < minimumNumberOfLongDistanceBuilders) {
+                            name = Game.spawns[spawn.name].createCreep([MOVE, MOVE, MOVE, MOVE, CARRY, CARRY, WORK, WORK],
                                     {role: 'longDistanceBuilder',
                                      homeRoom: room.name,
-                                     targetRoom: nextAvailableRoomName});
-                        }*/
+                                     targetRoom: nextAvailableRoomName,
+                                     working: false}); // working is very IMPORTANT!
+                        }
                         else if (numberOfLongDistanceMiners < minimumNumberOfLongDistanceMiners) {
                             Game.spawns[spawn.name].createCustomCreep(
                                 maximum_available_energy,
@@ -274,8 +289,8 @@ module.exports.loop = function () {
                                 nextAvailableRoomName); // todo like really bad dude :D
                         }
                         else if (numberOfLongDistanceTransporters < minimumNumberOfLongDistanceTransporters) {
-                            name = Game.spawns[spawn.name].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
-                                                                    CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
+                            name = Game.spawns[spawn.name].createCreep([MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE,
+                                                                    CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY, CARRY],
                                 {role: 'longDistanceTransporter',
                                  homeRoom: room.name,
                                  targetRoom: nextAvailableRoomName});
@@ -310,11 +325,10 @@ module.exports.loop = function () {
 
                 }
             }
+            // todo refactor - check if tower exists in room and the same for link!
             if (atTheMomentAvailableEnergy > 1200) {
                 // find all towers in specific room
-                var towers = Game.rooms[roomName].find(FIND_STRUCTURES, {
-                    filter: (s) => s.structureType == STRUCTURE_TOWER
-                });
+                var towers = _.filter(Game.structures, s => s.structureType == STRUCTURE_TOWER);
 
                 // loop through all towers and find closest enemy creep
                 for (let tower of towers) {
@@ -378,6 +392,150 @@ module.exports.loop = function () {
             runRoles(room.name);
         }
     }
+
+    for (let name in Game.creeps) {
+        // get the creep object
+        var creep = Game.creeps[name];
+
+        // if creep is harvester, call harvester script
+        if (creep.memory.role == 'harvester') {
+            roleHarvester.run(creep);
+        }
+    }
+
+    for (let spawnName in Game.spawns) {
+        let spawn = Game.spawns[spawnName];
+
+        if (spawn.name == 'TX-HQ') {
+            let creepsInRoom = spawn.room.find(FIND_MY_CREEPS);
+            let maximumAvailableEnergy = spawn.room.energyCapacityAvailable;
+
+            var numberOfMiners = _.sum(creepsInRoom, (c) => c.memory.role == 'miner' &&
+                                                            c.ticksToLive > 50);
+
+            var numberOfTransporters = _.sum(creepsInRoom, (c) => c.memory.role == 'transporter' &&
+                                                                  c.ticksToLive > 50);
+
+            if (numberOfMiners < spawn.memory.minNumberOfMiners) {
+                // check if all sources have miners
+                let sources = spawn.room.find(FIND_SOURCES);
+                // iterate over all sources
+                for (let source of sources) {
+                    // if the source has no miner
+                    if (!_.some(creepsInRoom, c => c.memory.role == 'miner' && c.memory.sourceId == source.id)) {
+                        Game.spawns[spawn.name].createCustomCreep(
+                                                    maximumAvailableEnergy,
+                                                    'miner',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    source.id);
+                        break;
+                    }
+                }
+            }
+            else if (numberOfTransporters < spawn.memory.minNumberOfTransporters) {
+                let sources = spawn.room.find(FIND_SOURCES);
+
+                for (let source of sources) {
+                    let energySource = Game.getObjectById(source.id);
+
+                    let containerId = energySource.pos.findInRange(FIND_STRUCTURES, 1, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })[0].id;
+
+                    if (!_.some(creepsInRoom, c => c.memory.role == 'transporter' && c.memory.containerId == containerId)) {
+                        Game.spawns[spawn.name].createCustomCreep(
+                                                    maximumAvailableEnergy,
+                                                    'transporter',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    containerId);
+                        break;
+                    }
+                }
+
+            }
+        }
+        else {
+            let creepsInRoom = spawn.room.find(FIND_MY_CREEPS);
+            let maximumAvailableEnergy = spawn.room.energyCapacityAvailable;
+
+            var numberOfHarvesters = _.sum(creepsInRoom, (c) => c.memory.role == 'harvester' &&
+                                                                c.ticksToLive > 50);
+
+            var numberOfMiners = _.sum(creepsInRoom, (c) => c.memory.role == 'miner' &&
+                                                            c.ticksToLive > 50);
+
+            var numberOfTransporters = _.sum(creepsInRoom, (c) => c.memory.role == 'transporter' &&
+                                                                  c.ticksToLive > 50);
+
+
+            if (numberOfMiners < spawn.memory.minNumberOfMiners) {
+                // check if all sources have miners
+                let sources = spawn.room.find(FIND_SOURCES);
+                // iterate over all sources
+                for (let source of sources) {
+                    // if the source has no miner
+                    if (!_.some(creepsInRoom, c => c.memory.role == 'miner' && c.memory.sourceId == source.id)) {
+                        Game.spawns[spawn.name].createCustomCreep(
+                                                    maximumAvailableEnergy,
+                                                    'miner',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    source.id);
+                        break;
+                    }
+                }
+            }
+            else if (numberOfHarvesters < spawn.memory.minNumberOfHarvesters) {
+                Game.spawns[spawn.name].createCustomCreep(
+                                        300,
+                                        'harvester');
+            }
+            else if (numberOfTransporters < spawn.memory.minNumberOfTransporters) {
+                let sources = spawn.room.find(FIND_SOURCES);
+
+                for (let source of sources) {
+                    let energySource = Game.getObjectById(source.id);
+
+                    let containerId = energySource.pos.findInRange(FIND_STRUCTURES, 1, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })[0].id;
+
+                    if (!_.some(creepsInRoom, c => c.memory.role == 'transporter' && c.memory.containerId == containerId)) {
+                        Game.spawns[spawn.name].createCustomCreep(
+                                                    maximumAvailableEnergy,
+                                                    'transporter',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    '',
+                                                    containerId);
+                        break;
+                    }
+                }
+
+            }
+        }
+
+    }
+
 
     function runRoles(roomName) {
         for (let name in Game.creeps) {
