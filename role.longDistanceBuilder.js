@@ -29,8 +29,8 @@ module.exports = {
 
                     if (spawnAndExtensions == undefined && damagedStructure == undefined) {
                         var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
-                            filter: (s) => s.structureType != STRUCTURE_WALL &&
-                                           s.structureType != STRUCTURE_RAMPART
+                            /*filter: (s) => s.structureType != STRUCTURE_WALL &&
+                                           s.structureType != STRUCTURE_RAMPART*/
                         });
                     }
 

@@ -11,7 +11,7 @@ module.exports = {
                 }
                 else {
                     let energyOnFloor = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-                        filter: s => s.energy > 50
+                        filter: s => s.energy > 999999
                     });
 
                     if (energyOnFloor != undefined) {

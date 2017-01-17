@@ -10,10 +10,13 @@ module.exports = function() {
                   targetRoom,
                   sourceId,
                   containerId) {
-
             var body = [];
 
             if (roleName == 'miner') {
+                let maxNeededEnergy = 700;
+                let startingParts = ['WORK', 'WORK', 'CARRY', 'MOVE']
+
+
                 if (energyAvailable > 700) {
                     // 6W 2M 1C - body part count
                     energyAvailable = 700;
@@ -63,10 +66,7 @@ module.exports = function() {
             }
             else if (roleName == 'energySmoother') {
                 if (energyAvailable > 600) {
-                    energyAvailable = 300;
-                }
-                else {
-                    energyAvailable = 300;
+                    energyAvailable = 600;
                 }
 
                 var energyNeededForCarryAndMoveParts =  (BODYPART_COST['carry'] * 2) + BODYPART_COST['move'];
@@ -108,12 +108,7 @@ module.exports = function() {
                 var allPartsTogether = allowedMoveParts + ',' + allowedCarryParts + ',' + allowedWorkParts + ',move' // todo - hacky way
                 var body = allPartsTogether.split(",");
 
-                return this.createCreep(body,
-                                        undefined,
-                                        {
-                                            role: roleName,
-                                            roomName: roomName
-                                        });
+                return this.createCreep(body, undefined,{ role: roleName });
             }
             else if (roleName == 'upgrader') {
                 if (energyAvailable > 600) {

@@ -121,7 +121,7 @@ module.exports = {
                 }
                 else {
                     var damagedWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: (i) => i.structureType == STRUCTURE_WALL && i.hits < 100000
+                        filter: (i) => i.structureType == STRUCTURE_WALL && i.hits < 10000
                     });
 
                     if (damagedWall != undefined) {
