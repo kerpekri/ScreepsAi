@@ -5,9 +5,16 @@ module.exports = {
             creep.moveTo(creep.pos.findClosestByRange(exit));
         }
         else if (creep.room.name == creep.memory.targetRoom) {
-            // todo tiesam ejam uz mineral?
-            var roomMineral = creep.pos.findClosestByPath(FIND_MINERALS);;
-            creep.moveTo(roomMineral);
+            var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+
+            if (hostileCreeps) {
+                if(creep.attack(hostileCreeps) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(hostileCreeps);
+                }
+            } else {
+                var roomMineral = creep.pos.findClosestByPath(FIND_MINERALS);;
+                creep.moveTo(roomMineral);
+            }
         }
         else {
             var exit = creep.room.findExitTo(creep.memory.homeRoom);

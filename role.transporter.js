@@ -27,12 +27,16 @@ module.exports = {
                     filter: (s) => s.structureType == STRUCTURE_SPAWN
                 });
 
-                let container = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                })[0];
+                // todo why _____????console.log(spawn)
 
-                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(container);
+                if (spawn) {
+                    let container = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })[0];
+
+                    if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container);
+                    }
                 }
             }
             else {

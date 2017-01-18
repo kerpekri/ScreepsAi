@@ -44,9 +44,17 @@ module.exports = {
             } else {
                 var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
-                if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                    creep.say('harvest');
-                    creep.moveTo(source);
+                let container = source.pos.findInRange(FIND_STRUCTURES, 1, {
+                    filter: s => s.structureType == STRUCTURE_CONTAINER
+                })[0];
+
+                if (creep.pos.isEqualTo(container.pos)) {
+                    // harvest source
+                    creep.harvest(source);
+                }
+                else {
+                    // move towards it
+                    creep.moveTo(container);
                 }
             }
         } else {
