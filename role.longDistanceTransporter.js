@@ -3,7 +3,7 @@ module.exports = {
         if (creep.room.name == creep.memory.homeRoom) {
             if (creep.carry.energy > 0) {
                 let building = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: s => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] < 1200) ||
+                    filter: s => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] < 1500) ||
                                  (s.structureType == STRUCTURE_LINK && s.energy != 800)
                 });
 

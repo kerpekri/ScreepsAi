@@ -2,7 +2,7 @@ module.exports = {
     run: function(creep, roomName) {
         if (creep.carry.energy == 0) {
             let energyOnFloor = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-                filter: s => s.energy > 50
+                filter: s => s.energy > 199
             });
 
             if (energyOnFloor != undefined) {
@@ -27,15 +27,26 @@ module.exports = {
                     filter: (s) => s.structureType == STRUCTURE_SPAWN
                 });
 
-                // todo why _____????console.log(spawn)
-
                 if (spawn) {
-                    let container = spawn.pos.findInRange(FIND_STRUCTURES, 2, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    let container = spawn.pos.findInRange(FIND_STRUCTURES, 3, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER &&
+                                     s.store[RESOURCE_ENERGY] < 600
                     })[0];
 
-                    if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container);
+                    if (container != undefined) {
+                        if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(container);
+                        }
+                    } else {
+                        var roomController = creep.room.controller;
+
+                        let container = roomController.pos.findInRange(FIND_STRUCTURES, 3, {
+                            filter: s => s.structureType == STRUCTURE_CONTAINER
+                        })[0];
+
+                        if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(container);
+                        }
                     }
                 }
             }

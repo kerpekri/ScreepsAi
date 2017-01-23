@@ -1,99 +1,74 @@
 module.exports = {
     run: function(creep) {
-        var explorerFlag = Game.flags[creep.memory.targetRoom + ':ExploreRoom:' + creep.memory.homeRoom];
-        var homeFlag = Game.flags[creep.memory.homeRoom + ':Home:' + creep.memory.homeRoom];
+        if (creep.room.name == creep.memory.homeRoom) {
+            var exit = creep.room.findExitTo(creep.memory.targetRoom);
+            creep.moveTo(creep.pos.findClosestByRange(exit));
+        } else if (creep.room.name == creep.memory.targetRoom) {
+            // if creep is bringing energy to a structure but has no energy left
+            if (creep.memory.working == true && creep.carry.energy == 0) {
+                // switch state
+                creep.memory.working = false;
+            }
+            // if creep is harvesting energy but is full
+            else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
+                // switch state
+                creep.memory.working = true;
+            }
 
-        if(explorerFlag){
-            if(creep.room == explorerFlag.room) {
-                if (creep.memory.working == true && creep.carry.energy == 0) {
-                    creep.memory.working = false;
-                }
-                else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
-                    creep.memory.working = true;
+            if (creep.memory.working == true) {
+                var damagedBuildings = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.hits < (s.hitsMax / 2)) ||
+                                   (s.structureType == STRUCTURE_ROAD && s.hits < (s.hitsMax / 6))
+                });
+
+                if (damagedBuildings == undefined) {
+                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{});
                 }
 
-                if (creep.memory.working == true) {
-                    var spawnAndExtensions = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: (s) => (s.structureType == STRUCTURE_SPAWN     ||
-                                        s.structureType == STRUCTURE_EXTENSION) &&
-                                        s.energy < s.energyCapacity
+                if (damagedBuildings != undefined) {
+                    creep.say('repair');
+                    if (creep.repair(damagedBuildings) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(damagedBuildings);
+                    }
+                } else if (constructionSite != undefined) {
+                    creep.say('build');
+                    if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(constructionSite);
+                    }
+                } else {
+                    let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
                     });
 
-                    if (spawnAndExtensions == undefined) {
-                        var damagedStructure = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                                filter: (s) => s.structureType != STRUCTURE_WALL &&
-                                               s.structureType != STRUCTURE_RAMPART &&
-                                               s.hits < (s.hitsMax / 2)
-                        });
-                    }
-
-                    if (spawnAndExtensions == undefined && damagedStructure == undefined) {
-                        var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
-                            /*filter: (s) => s.structureType != STRUCTURE_WALL &&
-                                           s.structureType != STRUCTURE_RAMPART*/
-                        });
-                    }
-
-                    if (spawnAndExtensions != undefined) {
-                        if (creep.transfer(spawnAndExtensions, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(spawnAndExtensions);
-                        }
-                    }
-                    else if (damagedStructure != undefined) {
-                        creep.say('repair');
-                        if (creep.repair(damagedStructure) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(damagedStructure);
-                        }
-                    }
-                    else if (constructionSite != undefined) {
-                        creep.say('build');
-                        if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(constructionSite);
-                        }
-                    }
-                    else {
-                        if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                            creep.say('upgrade');
-                            creep.moveTo(creep.room.controller);
-                        }
-                    }
-                }
-                else {
-                    let energyOnFloor = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
-                            filter: s => s.energy > 50
-                    });
-
-                    if (energyOnFloor == undefined) {
-                        var containerWithEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                            filter: (i) => i.structureType == STRUCTURE_CONTAINER &&
-                                           i.store[RESOURCE_ENERGY] > 100
-                        });
-                    }
-
-                    if (energyOnFloor != undefined) {
-                        if (creep.pickup(energyOnFloor, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(energyOnFloor);
-                        }
-                    }
-                    else if (containerWithEnergy != undefined) {
-                        if (creep.withdraw(containerWithEnergy, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.moveTo(containerWithEnergy);
-                        }
-                    }
-                    else {
-                        var source = creep.pos.findClosestByPath(FIND_SOURCES);
-
-                        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                            creep.say('harvest');
-                            creep.moveTo(source);
+                    if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.say('transfer');
+                        creep.moveTo(container);
+                    } else {
+                        creep.say('dropAll');
+                        for(var resourceType in creep.carry) {
+                            creep.drop(resourceType);
                         }
                     }
                 }
             } else {
-                creep.moveTo(explorerFlag)
+                let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: s => s.structureType == STRUCTURE_CONTAINER
+                });
+
+                if (container != undefined) {
+                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(container);
+                    }
+                } else {
+                    var source = creep.pos.findClosestByPath(FIND_SOURCES);
+                    if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(source);
+                    }
+                }
             }
         } else {
-            creep.moveTo(homeFlag);
+            var exit = creep.room.findExitTo(creep.memory.homeRoom);
+            creep.moveTo(creep.pos.findClosestByRange(exit));
         }
     }
 };

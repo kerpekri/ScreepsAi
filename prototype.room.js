@@ -1,4 +1,4 @@
-Room.prototype.buildxxx =
+/*Room.prototype.buildxxx =
     function (room, controller, spawn) {
         let extensionCount = _.sum( Game.structures, { roomName: this.name, structureType: STRUCTURE_EXTENSION } );
 
@@ -27,68 +27,111 @@ Room.prototype.buildxxx =
                 }
             }
             positionTest += 1;
+        }
+    }*/
+
+Room.prototype.buildRoadsFromToLocations =
+    function (spawn, to) {
+        var pathToSource = spawn.room.findPath(spawn.pos, to.pos);
+
+        /*for (var i=0;i<pathToSource.length;i+=1) {
+            spawn.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
         }*/
     }
 
 
-
-Room.prototype.buildRoadsForImportantObjects =
-    function (room) {
-		var sources = room.find(FIND_SOURCES);
-		var controller = room.controller;
-		var spawns = room.find(FIND_MY_SPAWNS);
-		var structures = room.find(FIND_MY_STRUCTURES, { filter: function (structure) {
-											return structure.structureType == STRUCTURE_EXTRACTOR
-												|| structure.structureType ==  STRUCTURE_STORAGE }
-		});
-
-        sources.concat(spawns);
-		structures.push(controller);
-
-        console.log(room,"buildroads betwen",structures);
-		for (var i = 0 ; i < structures.length ; i++ ){
-			for (var j = 0 ; j < structures.length ; j++ ){
-				if ( i != j) {
-					this.buildRoad(structures[i].pos, structures[j].pos);
-				}
-			}
-		}
-    }
-
-
-Room.prototype.buildRoadsFromToLocations =
-    function (from, to) {
-        for (let source of sources) {
-            var pathToSource = spawn.room.findPath(spawn.pos, source.pos);
-
+Room.prototype.buildRoadsToSourcesAndController =
+    function (spawn, sources, controller) {
+        sources.push(controller);
+        for (let object of sources) {
+            var pathToSource = spawn.room.findPath(spawn.pos, object.pos, {ignoreCreeps: true});
             for (var i=0;i<pathToSource.length;i+=1) {
                 spawn.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
             }
         }
-
+        spawn.memory.roadsBuilded = true
     }
 
-
-Room.prototype.buildRoadsToSources =
-    function (spawn, sources) {
-        for (let source of sources) {
-            var pathToSource = spawn.room.findPath(spawn.pos, source.pos);
-
-            for (var i=0;i<pathToSource.length;i+=1) {
-                spawn.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
-            }
-        }
-
-    }
 
 Room.prototype.buildRoadsToFlag =
     function (from, to) {
         flagPos = Game.flags[to].pos;
         pathToSource = from.room.findPath(from.pos, flagPos);
 
+        /*var look = flagPos.look();
+        look.forEach(function(lookObject) {
+            if(lookObject.type == LOOK_STRUCTURES) {
+                console.log(lookObject.type)
+                for (var i=0;i<lookObject.length;i+=1) {
+                    console.log(lookObject[i])
+                }
+            }
+        });*/
+        //for (var i=0;i<pathToSource.length;i+=1) {
+            //from.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
+        //}
+    }
+
+Room.prototype.buildRoadsToRoomExit =
+    function (from, toRoom) {
+        //flagPos = Game.flags[to].pos;
+        var exitDir = from.room.findExitTo(toRoom);
+        var exit = from.pos.findClosestByRange(exitDir);
+        var pathToSource = from.room.findPath(from.pos, exit);
+
         for (var i=0;i<pathToSource.length;i+=1) {
             from.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
         }
+
+
+        //var pathToSource = spawn.room.findPath(spawn.pos, source.pos);
+
+        /*var look = flagPos.look();
+        look.forEach(function(lookObject) {
+            if(lookObject.type == LOOK_STRUCTURES) {
+                console.log(lookObject.type)
+                for (var i=0;i<lookObject.length;i+=1) {
+                    console.log(lookObject[i])
+                }
+            }
+        });*/
+        //for (var i=0;i<pathToSource.length;i+=1) {
+            //from.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
+        //}
+    }
+
+Room.prototype.buildRoadsInNotOccupiedRoom =
+    function (spawn, toRoom, sources) {
+        //flagPos = Game.flags[to].pos;
+
+        for (let source of sources) {
+
+            var exitDir = source.room.findExitTo(toRoom);
+            var exit = source.pos.findClosestByRange(exitDir);
+            var pathToSource = spawn.room.findPath(spawn.pos, exit, {ignoreRoads: true, ignoreCreeps: true});
+            console.log(pathToSource)
+            for (var i=0;i<pathToSource.length;i+=1) {
+                //console.log(pathToSource[i].x + ':' + pathToSource[i].y)
+                //console.log(source.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD))
+                //spawn.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
+            }
+        }
+
+
+        //var pathToSource = spawn.room.findPath(spawn.pos, source.pos);
+
+        /*var look = flagPos.look();
+        look.forEach(function(lookObject) {
+            if(lookObject.type == LOOK_STRUCTURES) {
+                console.log(lookObject.type)
+                for (var i=0;i<lookObject.length;i+=1) {
+                    console.log(lookObject[i])
+                }
+            }
+        });*/
+        //for (var i=0;i<pathToSource.length;i+=1) {
+            //from.room.createConstructionSite(pathToSource[i].x, pathToSource[i].y, STRUCTURE_ROAD)
+        //}
     }
 
 Room.prototype.buildExtensions =
@@ -102,7 +145,8 @@ Room.prototype.buildTower =
     }
 
 Room.prototype.buildSourceContainers =
-    function (spawnRoom, sources) {
+    function (spawnRoom, sources, controller) {
+        sources.push(controller);
         for (let source of sources) {
             xCoordinates = source.pos.x;
             yCoordinates = source.pos.y;

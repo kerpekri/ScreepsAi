@@ -4,6 +4,7 @@ module.exports = {
             var exit = creep.room.findExitTo(creep.memory.targetRoom);
             creep.moveTo(creep.pos.findClosestByRange(exit));
         } else if (creep.room.name == creep.memory.targetRoom) {
+
             if (creep.carry.energy == creep.carryCapacity) {
                 var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{
                     filter: (s) => s.structureType == STRUCTURE_CONTAINER
@@ -48,14 +49,21 @@ module.exports = {
                     filter: s => s.structureType == STRUCTURE_CONTAINER
                 })[0];
 
-                if (creep.pos.isEqualTo(container.pos)) {
-                    // harvest source
-                    creep.harvest(source);
+                if (container != undefined) {
+                    if (creep.pos.isEqualTo(container.pos)) {
+                        // harvest source
+                        creep.harvest(source);
+                    }
+                    else {
+                        // move towards it
+                        creep.moveTo(container);
+                    }
+                } else {
+                    if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(source);
+                    }
                 }
-                else {
-                    // move towards it
-                    creep.moveTo(container);
-                }
+
             }
         } else {
             var exit = creep.room.findExitTo(creep.memory.homeRoom);

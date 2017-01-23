@@ -3,12 +3,28 @@ module.exports = {
         let wallAndRampartHp = 200000;
 
         if (creep.carry.energy == 0) {
+            let storage = creep.room.storage;
             let container = Game.getObjectById(creep.memory.spawnContainerId);
 
-            if (container != undefined) {
+            if (storage != undefined) {
+                if (creep.withdraw(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(storage);
+                }
+            } else if (container != undefined) {
                 if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.say('withdraw');
                     creep.moveTo(container);
+                }
+            } else {
+                var fullContainer = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (s) => s.structureType == STRUCTURE_CONTAINER  &&
+                                   s.store[RESOURCE_ENERGY] > 300
+                });
+
+                if (creep.withdraw(fullContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(fullContainer);
                 }
             }
             // todo think about this logic ko darit ja nav storage rooma?

@@ -1,40 +1,31 @@
 module.exports = {
     run: function(creep) {
-        var attackFlag = Game.flags['Controller:Attack:' + creep.memory.home_room];
-        //var xxxFlag = Game.flags[creep.memory.targetRoom: + ':Attack:' + creep.memory.homeRoom];
-        var homeFlag = Game.flags['Controller:Home:' + creep.memory.home_room];
+        var attackFlag = Game.flags['AttackRoom'];
 
         if(attackFlag){
-                var healerCreepId = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                   filter: (c) => c.getActiveBodyparts(HEAL) > 0
-                });
+            var healerCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+               filter: (c) => c.getActiveBodyparts(HEAL) > 0
+            });
 
-                var attackerCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
-                   filter: (c) => c.getActiveBodyparts(ATTACK) > 0
-                });
+            var attackerCreep = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS, {
+               filter: (c) => c.getActiveBodyparts(ATTACK) > 0
+            });
 
-                var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var hostileCreeps = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
 
-                var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
+            var hostileSpawns = creep.pos.findClosestByRange(FIND_HOSTILE_SPAWNS);
 
-                var hostileStructures = creep.pos.findClosestByRange(FIND_HOSTILE_STRUCTURES,
-                    { filter: (i) => i.structureType == STRUCTURE_WALL ||
-                                     i.structureType == STRUCTURE_CONTAINER});
+            var hostileWall = creep.pos.findClosestByRange(FIND_STRUCTURES,
+                { filter: (s) => (s.hits < 100 && s.structureType == STRUCTURE_WALL) });
 
             if(creep.room == attackFlag.room) {
                 if (1 == 2) {
                     creep.moveTo(attackFlag);
                 }
-                else if (hostileSpawns) {
-                    if(creep.attack(hostileSpawns) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(hostileSpawns);
+                else if (healerCreep) {
+                    if(creep.attack(healerCreep) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(healerCreep);
                     }
-                }
-                else if(healerCreepId) {
-                    if(creep.attack(healerCreepId) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(healerCreepId);
-                    }
-
                 }
                 else if(attackerCreep) {
                     if(creep.attack(attackerCreep) == ERR_NOT_IN_RANGE) {
@@ -42,14 +33,14 @@ module.exports = {
                     }
 
                 }
-                else if (hostileCreeps) {
-                    if(creep.attack(hostileCreeps) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(hostileCreeps);
+                else if (hostileWall == 9999) {
+                    if(creep.attack(hostileWall) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(hostileWall);
                     }
                 }
-                else if (hostileStructures) {
-                    if(creep.attack(hostileStructures) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(hostileStructures);
+                else if(hostileCreeps) {
+                    if(creep.attack(hostileCreeps) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(hostileCreeps);
                     }
 
                 }
@@ -57,6 +48,7 @@ module.exports = {
                     if(creep.attack(hostileSpawns) == ERR_NOT_IN_RANGE) {
                         creep.moveTo(hostileSpawns);
                     }
+
                 }
                 else {
                     creep.moveTo(attackFlag);
@@ -66,7 +58,7 @@ module.exports = {
                 creep.moveTo(attackFlag);
             }
         } else {
-            creep.moveTo(homeFlag);
+
         }
 
     }

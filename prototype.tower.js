@@ -20,7 +20,6 @@ StructureTower.prototype.defend =
             });
 
             if (structure != undefined) {
-                // build
                 this.repair(structure);
             }
             else if (closestDamagedUnit != undefined) {
@@ -28,12 +27,11 @@ StructureTower.prototype.defend =
             }
             else {
                 var structure = this.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (s) => (s.hits < (s.hitsMax / 10) && s.structureType == STRUCTURE_ROAD) ||
-                                   (s.hits < (s.hitsMax / 500) && s.structureType == STRUCTURE_RAMPART)
+                    filter: (s) => (s.hits < 10000 && s.structureType == STRUCTURE_RAMPART) ||
+                                   (s.hits < 10000 && s.structureType == STRUCTURE_WALL)
                 });
 
                 if (structure != undefined) {
-                    // build
                     this.repair(structure);
                 }
             }

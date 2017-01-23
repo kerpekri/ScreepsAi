@@ -228,3 +228,59 @@ module.exports = {
         }
     }
 };
+///
+var HARVESTER_PARTS = [MOVE, CARRY, WORK];
+var UPGRADER_PARTS = [MOVE, WORK, CARRY];
+var TRANSFER_PARTS = [MOVE, CARRY];
+var CONSTRUCTOR_PARTS = [WORK, CARRY, MOVE];
+var ATTACK_PARTS = [ATTACK, TOUGH, MOVE]
+var CLAIM_PARTS = [MOVE, CLAIM, CLAIM]
+
+function getPartCost(part) {
+  return BODYPART_COST[part];
+}
+
+function calculateParts(parts, maxCost, role) {
+  var i = 0;
+  var totalCost = 0;
+  var finalParts = [];
+  while (totalCost + getPartCost(parts[i % parts.length]) < maxCost) {
+    if (role == 'harvester') {
+        if (totalCost == 0) {
+            finalParts = [MOVE, CARRY, WORK];
+            totalCost = getPartCost(WORK) + getPartCost(MOVE) + getPartCost(CARRY);
+        } else {
+            finalParts.push(WORK);
+            totalCost += getPartCost(WORK);
+        }
+    } else {
+        finalParts.push(parts[i % parts.length]);
+        totalCost += getPartCost(parts[i % parts.length]);
+    }
+    i++;
+  }
+  return finalParts;
+}
+
+function getParts(role, maxCost) {
+  switch (role) {
+    case 'harvester':
+      return calculateParts(HARVESTER_PARTS, maxCost, role);
+    case 'harvester.remote':
+      return calculateParts(HARVESTER_PARTS, maxCost, role);
+    case 'transfer':
+      return calculateParts(TRANSFER_PARTS, maxCost, role);
+    case 'upgrader':
+      return calculateParts(UPGRADER_PARTS, maxCost, role);
+    case 'construction':
+      return calculateParts(CONSTRUCTOR_PARTS, maxCost, role);
+    case 'claim':
+      return calculateParts(CLAIM_PARTS, maxCost, role);
+    case 'guard':
+      return calculateParts(ATTACK_PARTS, maxCost, role);
+  }
+}
+
+module.exports.getParts = getParts;
+module.exports.getPartCost = getPartCost;
+module.exports.calculateParts = calculateParts;

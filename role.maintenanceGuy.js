@@ -1,6 +1,6 @@
 module.exports = {
     run: function(creep) {
-        let wallAndRampartHp = 200000;
+        let wallAndRampartHp = 50000;
 
         if (creep.carry.energy == 0) {
             let energyOnFloor = creep.pos.findClosestByPath(FIND_DROPPED_ENERGY, {
@@ -15,7 +15,7 @@ module.exports = {
             else {
                 var containerWithAlmostFullEnergy = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (i) => i.structureType == STRUCTURE_CONTAINER &&
-                                       i.store[RESOURCE_ENERGY] > 500
+                                       i.store[RESOURCE_ENERGY] > 1200
                 });
 
                 if (containerWithAlmostFullEnergy == undefined) {
@@ -34,10 +34,20 @@ module.exports = {
                 } else {
                     let container = Game.getObjectById(creep.memory.spawnContainerId);
 
-                    if (container != undefined) {
-                        if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                            creep.say('withdraw');
-                            creep.moveTo(container);
+                    if (container.store.energy > 200) {
+                        if (container != undefined) {
+                            if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                                creep.say('withdraw');
+                                creep.moveTo(container);
+                            }
+                        }
+                    }
+                    else {
+                        var source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+                        // try to harvest energy, if the source is not in range
+                        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                            // move towards the source
+                            creep.moveTo(source);
                         }
                     }
                 }
@@ -69,16 +79,31 @@ module.exports = {
                 }
             }
             else {
-                var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                var damagedBuilding = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: (s) => (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_CONTAINER) ||
+                                   (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_EXTENSION) ||
+                                   (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_STORAGE) ||
+                                   (s.hits < (s.hitsMax / 2) && s.structureType == STRUCTURE_LINK) ||
+                                   (s.hits < (s.hitsMax / 10) && s.structureType == STRUCTURE_ROAD)
+                });
 
-                if (constructionSite == undefined) {
+                if (damagedBuilding == undefined) {
+                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
+                }
+
+                if (constructionSite == undefined && damagedBuilding == undefined) {
                     var damagedWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (i) => (i.structureType == STRUCTURE_WALL && i.hits < wallAndRampartHp) ||
                                        (i.structureType == STRUCTURE_RAMPART && i.hits < wallAndRampartHp)
                     });
                 }
 
-                if (constructionSite != undefined) {
+                if (damagedBuilding != undefined) {
+                    if (creep.repair(damagedBuilding) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(damagedBuilding);
+                    }
+                }
+                else if (constructionSite != undefined) {
                     if (creep.build(constructionSite) == ERR_NOT_IN_RANGE) {
                         creep.say('build');
                         creep.moveTo(constructionSite);
