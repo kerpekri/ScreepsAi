@@ -51,6 +51,9 @@ module.exports = {
                     }
                 }
             }
+        } else {
+            var exit = creep.room.findExitTo(creep.memory.targetRoom);
+            creep.moveTo(creep.pos.findClosestByRange(exit));
         }
     }
 };

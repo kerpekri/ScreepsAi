@@ -45,28 +45,29 @@ module.exports = {
             } else {
                 var source = creep.pos.findClosestByPath(FIND_SOURCES);
 
-                let container = source.pos.findInRange(FIND_STRUCTURES, 1, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                })[0];
+                if (source != undefined) {
+                    let container = source.pos.findInRange(FIND_STRUCTURES, 1, {
+                        filter: s => s.structureType == STRUCTURE_CONTAINER
+                    })[0];
 
-                if (container != undefined) {
-                    if (creep.pos.isEqualTo(container.pos)) {
-                        // harvest source
-                        creep.harvest(source);
-                    }
-                    else {
-                        // move towards it
-                        creep.moveTo(container);
-                    }
-                } else {
-                    if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(source);
+                    if (container != undefined) {
+                        if (creep.pos.isEqualTo(container.pos)) {
+                            // harvest source
+                            creep.harvest(source);
+                        }
+                        else {
+                            // move towards it
+                            creep.moveTo(container);
+                        }
+                    } else {
+                        if (creep.harvest(source) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(source);
+                        }
                     }
                 }
-
             }
         } else {
-            var exit = creep.room.findExitTo(creep.memory.homeRoom);
+            var exit = creep.room.findExitTo(creep.memory.targetRoom);
             creep.moveTo(creep.pos.findClosestByRange(exit));
         }
     }

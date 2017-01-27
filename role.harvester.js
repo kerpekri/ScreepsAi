@@ -31,7 +31,9 @@ module.exports = {
 
             if (structure == undefined && constructionSite == undefined) {
                 var damagedBuildings = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (s) => s.hits < (s.hitsMax / 5)
+                    filter: (s) => s.hits < (s.hitsMax / 5) &&
+                                   s.structureType != STRUCTURE_WALL &&
+                                   s.structureType != STRUCTURE_RAMPART
                 });
             }
 

@@ -1,9 +1,32 @@
 module.exports = {
     run: function(creep) {
         if (creep.room.name == creep.memory.homeRoom) {
-            var exit = creep.room.findExitTo(creep.memory.targetRoom);
-            creep.moveTo(creep.pos.findClosestByRange(exit));
+            if (creep.carry.energy == creep.carryCapacity) {
+                let building = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                    filter: s => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] < 1500) ||
+                                 (s.structureType == STRUCTURE_LINK && s.energy != 800)
+                });
+
+                if (building != undefined) {
+                    creep.say('transfer');
+                    if (creep.transfer(building, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(building);
+                    }
+                    else {
+                        creep.say('fill storage');
+                        var storage = creep.room.storage;
+
+                        if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(storage);
+                        }
+                    }
+                }
+            } else {
+                var exit = creep.room.findExitTo(creep.memory.targetRoom);
+                creep.moveTo(creep.pos.findClosestByRange(exit));
+            }
         } else if (creep.room.name == creep.memory.targetRoom) {
+            console.log(creep.name)
             // if creep is bringing energy to a structure but has no energy left
             if (creep.memory.working == true && creep.carry.energy == 0) {
                 // switch state
@@ -18,7 +41,7 @@ module.exports = {
             if (creep.memory.working == true) {
                 var damagedBuildings = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.hits < (s.hitsMax / 2)) ||
-                                   (s.structureType == STRUCTURE_ROAD && s.hits < (s.hitsMax / 6))
+                                   (s.structureType == STRUCTURE_ROAD && s.hits < (s.hitsMax / 4))
                 });
 
                 if (damagedBuildings == undefined) {
@@ -40,14 +63,16 @@ module.exports = {
                         filter: s => s.structureType == STRUCTURE_CONTAINER
                     });
 
-                    if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                         creep.say('transfer');
                         creep.moveTo(container);
                     } else {
-                        creep.say('dropAll');
+                        //var exit = creep.room.findExitTo(creep.memory.homeRoom);
+                        //creep.moveTo(creep.pos.findClosestByRange(exit));
+                        /*creep.say('dropAll');
                         for(var resourceType in creep.carry) {
                             creep.drop(resourceType);
-                        }
+                        }*/
                     }
                 }
             } else {
@@ -67,7 +92,7 @@ module.exports = {
                 }
             }
         } else {
-            var exit = creep.room.findExitTo(creep.memory.homeRoom);
+            var exit = creep.room.findExitTo(creep.memory.targetRoom);
             creep.moveTo(creep.pos.findClosestByRange(exit));
         }
     }

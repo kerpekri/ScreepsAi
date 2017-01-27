@@ -12,12 +12,12 @@ StructureSpawn.prototype.setupMinimumHarvesters =
 
 StructureSpawn.prototype.setupMinimumWorkers =
     function (spawn) {
-        spawn.memory.minNumberOfHarvesters = 2; // harvesteri 2 - lvl 2 controller
+        spawn.memory.minNumberOfHarvesters = 1; // harvesteri 2 - lvl 2 controller
         spawn.memory.minNumberOfMiners = 2;
         spawn.memory.minNumberOfTransporters = 2;
         spawn.memory.minNumberOfEnergySmoothers = 1;
-        spawn.memory.minNumberOfMaintenanceGuys = 1; // 1 mguy - lvl 2 controller
-        spawn.memory.minNumberOfUpgraders = 1; // 1 upgrader - lvl 2 controller
+        spawn.memory.minNumberOfMaintenanceGuys = 2; // 1 mguy - lvl 2 controller
+        spawn.memory.minNumberOfUpgraders = 2; // 1 upgrader - lvl 2 controller
         spawn.memory.minNumberOfBuilders = 1;
         spawn.memory.harvesterEra = false;
     }
@@ -66,18 +66,49 @@ StructureSpawn.prototype.createMiner =
         return this.createCreep(body, undefined, { role: 'miner', sourceId: sourceId});
     }
 
+StructureSpawn.prototype.createMaintenanceGuy =
+    function (energyAvailable, spawnContainerId, controllerContainerId) {
+        let allPartsTogether = [];
+
+        // BODYPARTS_ALL[0] - MOVE
+        // BODYPARTS_ALL[1] - WORK
+        // BODYPARTS_ALL[2] - CARRY
+
+        if (energyAvailable >= 300 && energyAvailable < 700) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable >= 700 && energyAvailable < 1300) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]
+        }
+        else if (energyAvailable >= 1300) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]
+        } else {
+            console.log('maintenanceGuy FUNCTIONALITY NOT WORKING: ' + energyAvailable)
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        }
+
+        var body = allPartsTogether.split(',');
+        return this.createCreep(body, undefined, { role: 'maintenanceGuy',
+                                                   spawnContainerId: spawnContainerId,
+                                                   controllerContainerId: controllerContainerId});
+    }
+
 StructureSpawn.prototype.createTransporter =
     function (energyAvailable, containerId) {
         let allPartsTogether = [];
 
-        if (energyAvailable < 301) {
+        if (energyAvailable == 300) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else if (energyAvailable > 300 && energyAvailable <= 450) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else if (energyAvailable > 450 && energyAvailable <= 600) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable > 600 && energyAvailable <= 750) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable > 750) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         }
         else {
+            console.log('something wrong with tansporters')
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         }
 
@@ -89,16 +120,20 @@ StructureSpawn.prototype.createEnergySmoother =
     function (energyAvailable, spawnContainerId, controllerContainerId) {
         let allPartsTogether = [];
 
-        if (energyAvailable >= 300 && energyAvailable < 500) {
+        if (energyAvailable == 300) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
-        } else if (energyAvailable >= 500 && energyAvailable < 700) {
+        } else if (energyAvailable > 300 && energyAvailable <= 450) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
-        } else if (energyAvailable >= 700) {
+        } else if (energyAvailable > 450 && energyAvailable <= 600) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable > 600 && energyAvailable <= 750) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable > 750) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         }
         else {
-            console.log('ENERGYSMOOTHERS FUNCTIONALITY NOT WORKING: ' + energyAvailable)
-            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+            console.log('something wrong with energySmoothers')
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         }
 
         var body = allPartsTogether.split(',');
@@ -107,11 +142,12 @@ StructureSpawn.prototype.createEnergySmoother =
 
 StructureSpawn.prototype.createUpgrader =
     function (energyAvailable) {
+        console.log(energyAvailable)
         let allPartsTogether = [];
         // >= - greater than or equal to && <= - less than or equal to
         if (energyAvailable >= 300 && energyAvailable < 450) {
             allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]
-        } else if (energyAvailable >= 450 && energyAvailable < 550) {
+        } else if (energyAvailable >= 450 && energyAvailable < 600) {
             allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]
         }
         else if (energyAvailable >= 600 && energyAvailable < 750) {
@@ -123,8 +159,12 @@ StructureSpawn.prototype.createUpgrader =
         else if (energyAvailable >= 900 && energyAvailable < 1050) {
             allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]
         }
-        else if (energyAvailable > 1050) {
+        else if (energyAvailable >= 1050 && energyAvailable < 1300) {
             allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]
+        } else if (energyAvailable >= 1300 && energyAvailable < 1800) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]
+        } else if (energyAvailable >= 1800) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]
         }
         else {
             allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]
@@ -132,7 +172,7 @@ StructureSpawn.prototype.createUpgrader =
         }
 
         var body = allPartsTogether.split(',');
-        return this.createCreep(body, undefined, { role: 'upgrader' });
+        return this.createCreep(body, undefined, { role: 'upgrader', working: false });
     }
 
 StructureSpawn.prototype.createBuilder =
@@ -145,12 +185,44 @@ StructureSpawn.prototype.createBuilder =
         return this.createCreep(body, undefined, { role: 'builder' });
     }
 
+StructureSpawn.prototype.createRoomGuard =
+    function (energyAvailable) {
+        let allPartsTogether = [];
+
+        if (energyAvailable >= 300 && energyAvailable < 500) {
+            allPartsTogether = ''
+        } else {
+            allPartsTogether = ''
+        }
+
+        var body = allPartsTogether.split(',')
+        return this.createCreep(body, undefined, { role: 'roomGuard' });
+    }
+
 StructureSpawn.prototype.createlongDistanceMiner =
     function (energyAvailable, homeRoom, targetRoom) {
         let allPartsTogether = [];
-        // todo parak daudz no sakuma! 3w3m1c at the moment
-        allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]
 
+        if (energyAvailable == 300) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]
+        } else if (energyAvailable > 300 && energyAvailable < 449) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]
+        }
+        else if (energyAvailable > 449 && energyAvailable < 499) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]
+        }
+        else if (energyAvailable > 499 && energyAvailable < 599) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]
+        }
+        else if (energyAvailable > 599 && energyAvailable < 649) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]
+        }
+        else if (energyAvailable > 700) {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]
+        }
+        else {
+            allPartsTogether = BODYPARTS_ALL[1]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[1]+','+BODYPARTS_ALL[0]
+        }
         var body = allPartsTogether.split(',')
         return this.createCreep(body, undefined, { role: 'longDistanceMiner', homeRoom:homeRoom, targetRoom: targetRoom});
     }
@@ -158,13 +230,20 @@ StructureSpawn.prototype.createlongDistanceMiner =
 StructureSpawn.prototype.createlongDistanceTransporter =
     function (energyAvailable, homeRoom, targetRoom) {
         let allPartsTogether = [];
+        if (energyAvailable >= 700 && energyAvailable < 1300) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable >= 1300 && energyAvailable < 1500) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else if (energyAvailable >= 1500) {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+        } else {
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]
+            console.log('lDTransporte not working:' + energyAvailable)
+        }
 
-        allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]
-        console.log(allPartsTogether)
         var body = allPartsTogether.split(',')
         return this.createCreep(body, undefined, { role: 'longDistanceTransporter', homeRoom:homeRoom, targetRoom: targetRoom});
     }
-
 
 StructureSpawn.prototype.createCustomCreep =
         function (energyAvailable,

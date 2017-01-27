@@ -16,8 +16,9 @@ module.exports = {
             }
         }
         else {
-            var exit = creep.room.findExitTo(creep.memory.targetRoom);
-            creep.moveTo(creep.pos.findClosestByRange(exit));
+            creep.moveTo(Game.flags[':claimRoom:'])
+            //var exit = creep.room.findExitTo(creep.memory.homeRoom);
+            //creep.moveTo(creep.pos.findClosestByRange(exit));
         }
     }
 };

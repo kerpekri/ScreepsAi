@@ -51,8 +51,7 @@ else if (roleName == 'miner') {
 Game.creeps.Chase.memory.role = 'upgrader'
 
 // spawn new creep
-Game.spawns['TX-HQ'].createCreep([CARRY, CARRY, MOVE, MOVE], { role: 'transporter', GetEnergyFromContainer: true,
-                                            MoveEnergyToContainer: false, flagIndex: 'sourceOneContainer'})
+Game.spawns['TX-HQ'].createCreep([CARRY, CARRY, MOVE, MOVE, WORK], { role: 'transporter' })
 
 // https://www.youtube.com/watch?v=1UB0h468A8M&index=8&list=PL0EZQ169YGlor5rzeJEYYPE3tGYT2zGT2
 

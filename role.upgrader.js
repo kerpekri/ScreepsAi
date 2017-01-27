@@ -1,10 +1,28 @@
 module.exports = {
     run: function(creep) {
-        if (creep.carry.energy == 0) {
+        // if creep is bringing energy to a structure but has no energy left
+        if (creep.memory.working == true && creep.carry.energy == 0) {
+            // switch state
+            creep.memory.working = false;
+        }
+        // if creep is harvesting energy but is full
+        else if (creep.memory.working == false && creep.carry.energy == creep.carryCapacity) {
+            // switch state
+            creep.memory.working = true;
+        }
+
+        if (creep.memory.working == true) {
+            if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
+                creep.say('upgrade');
+                creep.moveTo(creep.room.controller);
+            }
+        }
+        else {
             var roomController = creep.room.controller;
 
             let container = roomController.pos.findInRange(FIND_STRUCTURES, 3, {
-                filter: s => s.structureType == STRUCTURE_CONTAINER
+                filter: s => s.structureType == STRUCTURE_CONTAINER &&
+                             s.store[RESOURCE_ENERGY] > 100
             })[0];
 
             if (container != undefined) {
@@ -20,12 +38,6 @@ module.exports = {
                     // move towards the source
                     creep.moveTo(source);
                 }
-            }
-        }
-        else {
-            if (creep.upgradeController(creep.room.controller) == ERR_NOT_IN_RANGE) {
-                creep.say('upgrade');
-                creep.moveTo(creep.room.controller);
             }
         }
     }
