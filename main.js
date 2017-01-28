@@ -52,7 +52,7 @@ module.exports.loop = function () {
         if (!spawn.memory.roadsBuilded) {
             spawnRoom.buildRoadsToSourcesAndController(spawn, sources, controller)
         }
-        //console.log(maximumAvailableEnergy)
+
         if (spawnRoom.controller.level >= 2 && !spawn.memory.containersBuilded) {
             spawnRoom.buildSourceContainers(spawnRoom, sources, controller)
             spawn.memory.containersBuilded = true
@@ -76,17 +76,13 @@ module.exports.loop = function () {
             spawnRoom.buildRoadsToFlag(spawn, 'extensions');
         }*/
 
-
-
-
         var links = Game.rooms[spawn.room.name].find(FIND_STRUCTURES, {
-            filter: (s) => (s.structureType == STRUCTURE_LINK && s.energy > 0)
+            filter: (s) => (s.structureType == STRUCTURE_LINK &&
+                            s.energy == s.energyCapacity )
         });
 
         for (let link of links) {
-            var storage = spawn.room.storage;
-
-            let targetLink = storage.pos.findInRange(FIND_STRUCTURES, 2, {
+            let targetLink = controller.pos.findInRange(FIND_STRUCTURES, 1, {
                 filter: s => s.structureType == STRUCTURE_LINK
             })[0];
 
@@ -160,15 +156,21 @@ module.exports.loop = function () {
                     }
                 }
                 else if (numberOfMaintenanceGuys < spawn.memory.minNumberOfMaintenanceGuys) {
-                    let spawnContainerId = spawn.pos.findInRange(FIND_STRUCTURES, 3, {
+                    let roomsStorage = spawnRoom.storage;
+
+                    if (roomsStorage != undefined) {
+                        energyContainer = roomsStorage.id;
+                    } else {
+                        energyContainer = spawn.pos.findInRange(FIND_STRUCTURES, 3, {
+                            filter: s => s.structureType == STRUCTURE_CONTAINER
+                        })[0].id;
+                    }
+
+                    let controllerContainerId = controller.pos.findInRange(FIND_STRUCTURES, 3, {
                         filter: s => s.structureType == STRUCTURE_CONTAINER
                     })[0].id;
 
-                    let controllerContainerId = controller.pos.findInRange(FIND_STRUCTURES, 2, {
-                        filter: s => s.structureType == STRUCTURE_CONTAINER
-                    })[0].id;
-
-                    Game.spawns[spawn.name].createMaintenanceGuy(maximumAvailableEnergy, spawnContainerId, controllerContainerId);
+                    Game.spawns[spawn.name].createMaintenanceGuy(maximumAvailableEnergy, energyContainer, controllerContainerId);
                 }
                 else if (numberOfTransporters < spawn.memory.minNumberOfTransporters) {
                     let sources = spawn.room.find(FIND_SOURCES);
@@ -254,14 +256,6 @@ module.exports.loop = function () {
                 }
             }
 
-            /*console.log(maximumAvailableEnergy + ':' + spawn.room)
-                console.log(numberOfMiners + ':' + spawn.room)
-                console.log(numberOfMaintenanceGuys + ':' + spawn.room)
-                console.log(numberOfTransporters + ':' + spawn.room)
-                console.log(numberOfEnergySmoothers + ':' + spawn.room)
-                console.log(numberOfUpgraders + ':' + spawn.room)*/
-
-
             if (maximumAvailableEnergy >= 700 &&
                     numberOfMiners >= spawn.memory.minNumberOfMiners &&
                     numberOfMaintenanceGuys >= spawn.memory.minNumberOfMaintenanceGuys &&
@@ -304,8 +298,6 @@ module.exports.loop = function () {
                                                                              c.memory.targetRoom == targetRoom &&
                                                                              c.ticksToLive > spawnBeforeTicks);
 
-                            //console.log(targetRoom)
-
                             var numberOfLongDistanceMiners = _.sum(Game.creeps, (c) => c.memory.role == 'longDistanceMiner' &&
                                                                                        c.memory.targetRoom == targetRoom &&
                                                                                        c.ticksToLive > spawnBeforeTicks);
@@ -341,11 +333,16 @@ module.exports.loop = function () {
                                 }*/
                             }
                             else if (numberOfClaimers < spawn.memory.minNumberOfClaimers) {
+
                                 if (maximumAvailableEnergy >= 1300) {
+                                    //if (Game.rooms[targetRoom].controller.reservation) {}
                                     Game.spawns[spawn.name].createCreep([CLAIM, CLAIM, MOVE, MOVE],
                                                                         {role: 'claimer',
                                                                         homeRoom: spawn.room.name,
                                                                         targetRoom: targetRoom});
+
+
+
                                     /*if (Game.rooms[targetRoom] == undefined) {
                                         Game.spawns[spawn.name].createCreep([CLAIM, CLAIM, MOVE, MOVE],
                                                                     {role: 'claimer',
@@ -390,11 +387,16 @@ module.exports.loop = function () {
                                                  working: false}); // working is very IMPORTANT!
                             }
                             else if (numberOfLongDistanceTransporters < spawn.memory.minNumberOfLongDistanceTransporters) {
-                                 Game.spawns[spawn.name].createlongDistanceTransporter(maximumAvailableEnergy,
+                                let roomContainerCount = Game.rooms[targetRoom].find(FIND_STRUCTURES, {
+                                                                                        filter: (structure) => {
+                                                                                        return (structure.structureType == STRUCTURE_CONTAINER)}})
+                                                                                .length
+
+                                if (roomContainerCount > 0) {
+                                    Game.spawns[spawn.name].createlongDistanceTransporter(maximumAvailableEnergy,
                                                                                        spawn.room.name,
                                                                                        targetRoom);
-
-
+                                }
                             }
                         }
                 }
@@ -433,7 +435,7 @@ module.exports.loop = function () {
                                                                                 return (structure.structureType == STRUCTURE_SPAWN)}})
                                                                     .length;
 
-                        console.log(zcontainerCount)*/
+                        */
                             /*if (Game.rooms[claimRoom].controller.reservation == undefined) {
                                 Game.spawns[spawn.name].createCreep([CLAIM, MOVE],
                                                                         {role: 'claimer',

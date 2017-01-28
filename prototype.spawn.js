@@ -103,9 +103,9 @@ StructureSpawn.prototype.createTransporter =
         } else if (energyAvailable > 450 && energyAvailable <= 600) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else if (energyAvailable > 600 && energyAvailable <= 750) {
-            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else if (energyAvailable > 750) {
-            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         }
         else {
             console.log('something wrong with tansporters')
@@ -235,7 +235,7 @@ StructureSpawn.prototype.createlongDistanceTransporter =
         } else if (energyAvailable >= 1300 && energyAvailable < 1500) {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else if (energyAvailable >= 1500) {
-            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
+            allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]
         } else {
             allPartsTogether = BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[2]+','+BODYPARTS_ALL[0]+','+BODYPARTS_ALL[2]
             console.log('lDTransporte not working:' + energyAvailable)

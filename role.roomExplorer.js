@@ -17,23 +17,6 @@ module.exports = {
             }
         }
         else {
-            //var pos = new RoomPosition(25, 25, creep.memory.targetRoom);
-            //creep.moveTo(pos);
-            //console.log(creep.moveTo(pos))
-
-            /*var route = Game.map.findRoute(creep.room.name, creep.memory.targetRoom);
-            var exit = creep.pos.findClosestByRange(route[0].exit);
-            console.log(route)
-            console.log(exit)*/
-            //creep.moveTo(exit);
-
-            /*var pos = new RoomPosition(25, 25, creep.memory.targetRoom);
-creep.moveTo(pos);
-
-var route = Game.map.findRoute(creep.room, creep.memory.targetRoom);
- var exit = creep.pos.findClosestByRange(route[0].exit);
- creep.moveTo(exit); */
-
         }
     }
 };

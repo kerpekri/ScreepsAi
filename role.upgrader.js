@@ -20,12 +20,24 @@ module.exports = {
         else {
             var roomController = creep.room.controller;
 
-            let container = roomController.pos.findInRange(FIND_STRUCTURES, 3, {
-                filter: s => s.structureType == STRUCTURE_CONTAINER &&
-                             s.store[RESOURCE_ENERGY] > 100
+            let link = roomController.pos.findInRange(FIND_STRUCTURES, 1, {
+                filter: s => s.structureType == STRUCTURE_LINK &&
+                             s.energy > 0
             })[0];
 
-            if (container != undefined) {
+           // if (link == undefined) {
+                let container = roomController.pos.findInRange(FIND_STRUCTURES, 1, {
+                    filter: s => s.structureType == STRUCTURE_CONTAINER &&
+                                 s.store[RESOURCE_ENERGY] > 100
+                })[0];
+            //}
+
+            if (link != undefined) {
+                if (creep.withdraw(link, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                    creep.say('withdraw');
+                    creep.moveTo(link);
+                }
+            } else if (container != undefined) {
                 if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                     creep.say('withdraw');
                     creep.moveTo(container);

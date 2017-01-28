@@ -68,44 +68,35 @@ module.exports = {
         else if (creep.carryCapacity == creep.carryCapacity) {
             let container = Game.getObjectById(creep.memory.controllerContainerId);
 
-            if (_.sum(container.store) < 1000) {
-                if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                    creep.say('transfer');
-                    creep.moveTo(container);
-                }
-            }
-            else {
-                var spawnAndExtensions = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_SPAWN     ||
-                                    s.structureType == STRUCTURE_EXTENSION) &&
-                                    s.energy < s.energyCapacity
-                });
-
-                if (spawnAndExtensions == undefined) {
-                    var storage = creep.room.storage;
-                }
-
-                if (spawnAndExtensions != undefined) {
-                    if (creep.transfer(spawnAndExtensions, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(spawnAndExtensions);
+            if (container != undefined) {
+               if (_.sum(container.store) < 1000) {
+                    if (creep.transfer(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.say('transfer');
+                        creep.moveTo(container);
                     }
-                } else if (storage != undefined) {
-                    if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(storage);
-                    }
-                } else {
-                    var damagedWall = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                        filter: (i) => (i.structureType == STRUCTURE_WALL && i.hits < wallAndRampartHp) ||
-                                       (i.structureType == STRUCTURE_RAMPART && i.hits < wallAndRampartHp)
+               } else {
+                    var spawnAndExtensions = creep.pos.findClosestByPath(FIND_STRUCTURES, {
+                        filter: (s) => (s.structureType == STRUCTURE_SPAWN     ||
+                                        s.structureType == STRUCTURE_EXTENSION) &&
+                                        s.energy < s.energyCapacity
                     });
 
-                    if (damagedWall != undefined) {
-                        if (creep.repair(damagedWall) == ERR_NOT_IN_RANGE) {
-                            creep.say('rep wall');
-                            creep.moveTo(damagedWall);
+                    if (spawnAndExtensions == undefined) {
+                        var storage = creep.room.storage;
+                    }
+
+                    if (spawnAndExtensions != undefined) {
+                        if (creep.transfer(spawnAndExtensions, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(spawnAndExtensions);
+                        }
+                    } else if (storage != undefined) {
+                        if (creep.transfer(storage, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.moveTo(storage);
                         }
                     }
-                }
+               }
+            } else {
+
             }
         }
     }

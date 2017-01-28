@@ -1,7 +1,7 @@
 module.exports = {
     run: function(creep) {
         if (creep.room.name == creep.memory.homeRoom) {
-            if (creep.carry.energy == creep.carryCapacity) {
+            if (creep.carry.energy > 0) {
                 let building = creep.pos.findClosestByPath(FIND_STRUCTURES, {
                     filter: s => (s.structureType == STRUCTURE_CONTAINER && s.store[RESOURCE_ENERGY] < 1500) ||
                                  (s.structureType == STRUCTURE_LINK && s.energy != 800)
@@ -26,7 +26,6 @@ module.exports = {
                 creep.moveTo(creep.pos.findClosestByRange(exit));
             }
         } else if (creep.room.name == creep.memory.targetRoom) {
-            console.log(creep.name)
             // if creep is bringing energy to a structure but has no energy left
             if (creep.memory.working == true && creep.carry.energy == 0) {
                 // switch state
@@ -40,12 +39,12 @@ module.exports = {
 
             if (creep.memory.working == true) {
                 var damagedBuildings = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: (s) => (s.structureType == STRUCTURE_CONTAINER && s.hits < (s.hitsMax / 2)) ||
-                                   (s.structureType == STRUCTURE_ROAD && s.hits < (s.hitsMax / 4))
+                    filter: (i) => (i.structureType != STRUCTURE_WALL || i.structureType != STRUCTURE_RAMPART) &&
+                                   (i.hits < (i.hitsMax / 3))
                 });
 
                 if (damagedBuildings == undefined) {
-                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES,{});
+                    var constructionSite = creep.pos.findClosestByPath(FIND_CONSTRUCTION_SITES);
                 }
 
                 if (damagedBuildings != undefined) {
@@ -63,26 +62,23 @@ module.exports = {
                         filter: s => s.structureType == STRUCTURE_CONTAINER
                     });
 
-                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.say('transfer');
-                        creep.moveTo(container);
+                    if (container != undefined && creep.carry.energy != creep.carryCapacity) {
+                        if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                            creep.say('withdraw');
+                            creep.moveTo(container);
+                        }
                     } else {
-                        //var exit = creep.room.findExitTo(creep.memory.homeRoom);
-                        //creep.moveTo(creep.pos.findClosestByRange(exit));
-                        /*creep.say('dropAll');
-                        for(var resourceType in creep.carry) {
-                            creep.drop(resourceType);
-                        }*/
+                        var exit = creep.room.findExitTo(creep.memory.homeRoom);
+                        creep.moveTo(creep.pos.findClosestByRange(exit));
                     }
                 }
             } else {
-                let container = creep.pos.findClosestByPath(FIND_STRUCTURES, {
-                    filter: s => s.structureType == STRUCTURE_CONTAINER
-                });
+                let roomsContainer = creep.room.find(FIND_STRUCTURES, {filter: s => s.structureType == STRUCTURE_CONTAINER})[0];
 
-                if (container != undefined) {
-                    if (creep.withdraw(container, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
-                        creep.moveTo(container);
+                if (roomsContainer != undefined) {
+                    if (creep.withdraw(roomsContainer, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
+                        creep.say('withdraw');
+                        creep.moveTo(roomsContainer);
                     }
                 } else {
                     var source = creep.pos.findClosestByPath(FIND_SOURCES);
